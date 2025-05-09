@@ -24,8 +24,10 @@ public:
     bool Initialize(int width, int height);
     void HierarchicalUpdate2(double dt);
     void Render();
+    glm::mat4 GetStarshipModelMatrix() const;
 
     Camera* getCamera() { return m_camera; }
+    Mesh* getMesh() { return m_mesh; }
 
 private:
     std::string ErrorString(GLenum error);
@@ -39,6 +41,7 @@ private:
 
     Camera* m_camera;
     Shader* m_shader;
+    Mesh* m_mesh;
 
     GLint m_projectionMatrix;
     GLint m_viewMatrix;
@@ -53,7 +56,7 @@ private:
     Sphere* m_sphere2;
     Sphere* m_sphere3;
 
-    Mesh* m_mesh;
+   
 
 
 

@@ -1,2 +1,7 @@
-﻿  camera.cpp
-  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
+﻿  engine.cpp
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(180,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(228,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(229,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe

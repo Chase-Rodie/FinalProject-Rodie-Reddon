@@ -95,6 +95,28 @@ void Camera::SetPosition(const glm::vec3& pos) {
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
+void Camera::SetTarget(const glm::vec3& target) {
+    cameraFront = glm::normalize(target - cameraPos);
+    cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));
+    cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
+    UpdateView();
+}
+
+void Camera::SetUp(const glm::vec3& upVec) {
+    worldUp = upVec;
+    cameraRight = glm::normalize(glm::cross(cameraFront, worldUp));
+    cameraUp = glm::normalize(glm::cross(cameraRight, cameraFront));
+    UpdateView();
+}
 
 
 
+void Camera::FaceDirection(const glm::vec3& target)
+{
+    glm::vec3 direction = glm::normalize(target - cameraPos);
+
+    pitch = glm::degrees(asin(direction.y));
+    yaw = glm::degrees(atan2(direction.z, direction.x));
+
+    updateCameraVectors();
+}

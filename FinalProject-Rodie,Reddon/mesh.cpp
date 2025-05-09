@@ -204,3 +204,17 @@ bool Mesh::loadModelFromFile(const char* path) {
 
 	return true;
 }
+
+
+void Mesh::Rotate(float pitch, float yaw, float roll) {
+	glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(roll), glm::vec3(0, 0, 1));
+	rotation = glm::rotate(rotation, glm::radians(pitch), glm::vec3(1, 0, 0));
+	rotation = glm::rotate(rotation, glm::radians(yaw), glm::vec3(0, 1, 0));
+
+	model = model * rotation;
+}
+
+void Mesh::MoveForward(float amount) {
+	glm::vec3 forward = glm::normalize(glm::vec3(model[2]));
+	model = glm::translate(model, forward * amount);
+}

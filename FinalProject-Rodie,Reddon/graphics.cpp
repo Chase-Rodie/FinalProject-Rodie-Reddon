@@ -76,7 +76,11 @@ bool Graphics::Initialize(int width, int height)
 	}
 
 	// Starship
-	m_mesh = new Mesh(glm::vec3(2.0f, 3.0f, -5.0f), "assets\\SpaceShip-1.obj", "assets\\SpaceShip-1.png");
+	m_mesh = new Mesh(glm::vec3(0.0f), "assets\\SpaceShip-1.obj", "assets\\SpaceShip-1.png");
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -20.0f)) *
+		glm::scale(glm::vec3(0.025f));
+	m_mesh->Update(model);
+
 
 	// The Sun
 	m_sphere = new Sphere(64, "assets\\2k_sun.jpg");
@@ -155,7 +159,7 @@ void Graphics::HierarchicalUpdate2(double dt) {
 
 	// Final model matrix
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), shipPos) * orientation * glm::scale(glm::vec3(0.3f));
-	m_mesh->Update(model);
+	//m_mesh->Update(model);
 
 }
 
@@ -363,5 +367,9 @@ std::string Graphics::ErrorString(GLenum error)
 	{
 		return "None";
 	}
+}
+
+glm::mat4 Graphics::GetStarshipModelMatrix() const {
+	return m_mesh->GetModel();
 }
 

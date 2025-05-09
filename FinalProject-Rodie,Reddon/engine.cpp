@@ -79,39 +79,86 @@ void Engine::ProcessInput()
 
     float camSpeed = 5.0f * deltaTime;
 
-    if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
-        cam->ProcessKeyboard("FORWARD", camSpeed);
-    if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
-        cam->ProcessKeyboard("BACKWARD", camSpeed);
-    if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
-        cam->ProcessKeyboard("LEFT", camSpeed);
-    if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
-        cam->ProcessKeyboard("RIGHT", camSpeed);
+    //observation mode
+    if (currentMode == GameMode::Observation) {
 
+        if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
+            cam->ProcessKeyboard("FORWARD", camSpeed);
+        if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
+            cam->ProcessKeyboard("BACKWARD", camSpeed);
+        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
+            cam->ProcessKeyboard("LEFT", camSpeed);
+        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
+            cam->ProcessKeyboard("RIGHT", camSpeed);
+    }
+    //exploration mode
+    else if(currentMode == GameMode::Exploration){
+        Mesh* ship = m_graphics->getMesh();
+
+        float shipSpeed = 65.0f * deltaTime;
+
+        if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            shipSpeed *= 3.0f;
+
+        if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
+            ship->MoveForward(shipSpeed);
+        if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
+            ship->MoveForward(-shipSpeed);
+        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
+            ship->Rotate(0.0f, 60.0f * deltaTime, 0.0f); // turn left
+        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
+            ship->Rotate(0.0f, -60.0f * deltaTime, 0.0f); // turn right
+    
+    }
+
+    bool tabPressed = glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS;
+ 
     if (glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS) {
-        if (!tabPressedLastFrame) {
+        if (tabPressed && !tabPressedLastFrame) {
             tabPressedLastFrame = true;
 
             if (currentMode == GameMode::Exploration) {
                 currentMode = GameMode::Observation;
-
+                std::cout << "Switched to Observation Mode\n";
                 cachedCamPos = cam->cameraPos;
                 cachedCamFront = cam->cameraFront;
                 cachedCamUp = cam->cameraUp;
 
+                glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
+                glm::vec3 shipPos = glm::vec3(shipModel[3]);
+                glm::vec3 shipForward = glm::normalize(glm::vec3(shipModel[2]));
+
+                glm::vec3 cameraPos = shipPos + shipForward * 2.5f; // move 0.5 units in front of ship
                 glm::vec3 planetPos = glm::vec3(5.0f, 0.0f, 0.0f);
-                glm::vec3 observationPos = planetPos + glm::vec3(0.0f, 0.0f, 4.0f);
-                cam->SetPosition(observationPos);
+
+                cam->SetPosition(cameraPos);
+                cam->FaceDirection(planetPos);
+
+
+
+                firstMouse = true;
+
+            }
+            else {
+                currentMode = GameMode::Exploration;
+                std::cout << "Switched to Exploration Mode\n";
+
+
+                Camera* cam = m_graphics->getCamera();
+                cam->SetPosition(cachedCamPos);
                 cam->cameraFront = cachedCamFront;
                 cam->cameraUp = cachedCamUp;
                 cam->UpdateView();
 
+                firstMouse = true;
             }
         }
-        else {
+    }
+        if (!tabPressed) {
             tabPressedLastFrame = false;
         }
-    }
+
+    
 
 }
 
@@ -149,13 +196,13 @@ void Engine::Display(GLFWwindow* window, double time) {
     m_graphics->HierarchicalUpdate2(time);
 
     if (currentMode == GameMode::Exploration) {
-        glm::mat4 shipModel = m_graphics->GetStarshipModel();
+        glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
         glm::vec3 shipPos = glm::vec3(shipModel[3]);
-        glm::vec3 forward = glm::normalize(glm::vec3(-shipModel[2]));
+        glm::vec3 forward = glm::normalize(glm::vec3(shipModel[2]));
         glm::vec3 up = glm::normalize(glm::vec3(shipModel[1]));
 
-        float distanceBack = 10.0f;
-        float distanceUp = 3.0f;
+        float distanceBack = 2.5f;
+        float distanceUp = 0.5f;
         glm::vec3 camWorldPos = shipPos - forward * distanceBack + up * distanceUp;
 
         Camera* cam = m_graphics->getCamera();
@@ -175,6 +222,7 @@ void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double yp
         engine->lastX = xpos;
         engine->lastY = ypos;
         engine->firstMouse = false;
+        return;
     }
 
     float xoffset = xpos - engine->lastX;
@@ -182,7 +230,11 @@ void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double yp
 
     engine->lastX = xpos;
     engine->lastY = ypos;
-
-    cam->ProcessMouseMovement(xoffset, yoffset);
+    if (engine->currentMode == GameMode::Observation) {
+        cam->ProcessMouseMovement(xoffset, yoffset);  // Always rotate with mouse in this mode
+    }
+    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        cam->ProcessMouseMovement(xoffset, yoffset);  // Only rotate while dragging
+    }
 }
 

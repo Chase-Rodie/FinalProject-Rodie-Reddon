@@ -15,6 +15,7 @@ public:
     void ProcessMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
     void ProcessMouseScroll(float yoffset);
     void UpdateView();
+    void FaceDirection(const glm::vec3& target);
 
 
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);
