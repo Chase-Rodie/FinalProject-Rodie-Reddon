@@ -1,12 +1,88 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|solutionrelative:FinalProject-Rodie,Reddon\\engine.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|solutionrelative:FinalProject-Rodie,Reddon\\camera.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|solutionrelative:FinalProject-Rodie,Reddon\\camera.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{B15D2816-B022-4086-B676-12008CE71369}|FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon.vcxproj|solutionrelative:FinalProject-Rodie,Reddon\\engine.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "camera.cpp",
+              "DocumentMoniker": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.cpp",
+              "RelativeDocumentMoniker": "FinalProject-Rodie,Reddon\\camera.cpp",
+              "ToolTip": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.cpp",
+              "RelativeToolTip": "FinalProject-Rodie,Reddon\\camera.cpp",
+              "ViewState": "AgIAAFEAAAAAAAAAAAAAAF4AAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-05-09T07:16:57.943Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "camera.h",
+              "DocumentMoniker": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.h",
+              "RelativeDocumentMoniker": "FinalProject-Rodie,Reddon\\camera.h",
+              "ToolTip": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\camera.h",
+              "RelativeToolTip": "FinalProject-Rodie,Reddon\\camera.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-05-09T07:15:46.653Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "engine.h",
+              "DocumentMoniker": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.h",
+              "RelativeDocumentMoniker": "FinalProject-Rodie,Reddon\\engine.h",
+              "ToolTip": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.h",
+              "RelativeToolTip": "FinalProject-Rodie,Reddon\\engine.h",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAACQAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-05-09T07:13:19.953Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "engine.cpp",
+              "DocumentMoniker": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.cpp",
+              "RelativeDocumentMoniker": "FinalProject-Rodie,Reddon\\engine.cpp",
+              "ToolTip": "C:\\Users\\Chase\\source\\repos\\FinalProject-Rodie,Reddon\\FinalProject-Rodie,Reddon\\engine.cpp",
+              "RelativeToolTip": "FinalProject-Rodie,Reddon\\engine.cpp",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAAAGcAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-05-09T07:11:04.65Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

@@ -8,6 +8,12 @@
 
 //static void cursorPositionCallBack(GLFWwindow*, double xpos, double ypos);
 
+enum class GameMode {
+    Exploration,
+    Observation
+};
+
+
 class Engine
 {
 public:
@@ -22,6 +28,13 @@ public:
     void Display(GLFWwindow*, double);
     static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
     Camera* getCamera() { return m_graphics->getCamera(); }
+
+    glm::vec3 cachedCamPos;
+    glm::vec3 cachedCamFront;
+    glm::vec3 cachedCamUp;
+    bool tabPressedLastFrame = false;
+
+    GameMode currentMode = GameMode::Exploration;
 
 
 
@@ -38,6 +51,7 @@ private:
 
     float deltaTime = 0.0f;
     float lastFrame = 0.0f;
+
 
 
 

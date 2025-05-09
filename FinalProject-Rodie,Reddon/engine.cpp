@@ -87,6 +87,32 @@ void Engine::ProcessInput()
         cam->ProcessKeyboard("LEFT", camSpeed);
     if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
         cam->ProcessKeyboard("RIGHT", camSpeed);
+
+    if (glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS) {
+        if (!tabPressedLastFrame) {
+            tabPressedLastFrame = true;
+
+            if (currentMode == GameMode::Exploration) {
+                currentMode = GameMode::Observation;
+
+                cachedCamPos = cam->cameraPos;
+                cachedCamFront = cam->cameraFront;
+                cachedCamUp = cam->cameraUp;
+
+                glm::vec3 planetPos = glm::vec3(5.0f, 0.0f, 0.0f);
+                glm::vec3 observationPos = planetPos + glm::vec3(0.0f, 0.0f, 4.0f);
+                cam->SetPosition(observationPos);
+                cam->cameraFront = cachedCamFront;
+                cam->cameraUp = cachedCamUp;
+                cam->UpdateView();
+
+            }
+        }
+        else {
+            tabPressedLastFrame = false;
+        }
+    }
+
 }
 
 
@@ -121,6 +147,22 @@ void Engine::Display(GLFWwindow* window, double time) {
     m_graphics->Render();
     m_window->Swap();
     m_graphics->HierarchicalUpdate2(time);
+
+    if (currentMode == GameMode::Exploration) {
+        glm::mat4 shipModel = m_graphics->GetStarshipModel();
+        glm::vec3 shipPos = glm::vec3(shipModel[3]);
+        glm::vec3 forward = glm::normalize(glm::vec3(-shipModel[2]));
+        glm::vec3 up = glm::normalize(glm::vec3(shipModel[1]));
+
+        float distanceBack = 10.0f;
+        float distanceUp = 3.0f;
+        glm::vec3 camWorldPos = shipPos - forward * distanceBack + up * distanceUp;
+
+        Camera* cam = m_graphics->getCamera();
+        cam->SetPosition(camWorldPos);
+        cam->SetTarget(shipPos);
+        cam->SetUp(up);
+    }
 }
 
 void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)

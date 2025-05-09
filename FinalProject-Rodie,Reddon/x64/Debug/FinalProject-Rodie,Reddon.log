@@ -1,24 +1,2 @@
 ﻿  camera.cpp
-  engine.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(107,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(138,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(139,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  graphics.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(177,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(177,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  main.cpp
-  mesh.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.cpp(99,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.cpp(138,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.cpp(179,20): warning C4018: '<': signed/unsigned mismatch
-  object.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\object.cpp(73,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  shader.cpp
-  sphere.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\sphere.cpp(90,46): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Texture.cpp
-  window.cpp
-  Generating Code...
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe

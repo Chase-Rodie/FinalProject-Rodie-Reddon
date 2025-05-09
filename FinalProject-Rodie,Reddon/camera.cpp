@@ -90,4 +90,11 @@ void Camera::UpdateView()
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
+void Camera::SetPosition(const glm::vec3& pos) {
+    cameraPos = pos;
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+}
+
+
+
 
