@@ -1,4 +1,9 @@
 #include "graphics.h"
+std::vector<CelestialBody> planets;
+std::vector<Sphere*> planetSpheres;
+std::vector<Moon> moons;
+
+
 
 Graphics::Graphics()
 {
@@ -86,11 +91,38 @@ bool Graphics::Initialize(int width, int height)
 	m_sphere = new Sphere(64, "assets\\2k_sun.jpg");
 
 	// The Earth
-	m_sphere2 = new Sphere(48, "assets\\2k_earth_daymap.jpg");
+	//m_sphere2 = new Sphere(48, "assets\\2k_earth_daymap.jpg");
 
 	// The moon
-	m_sphere3 = new Sphere(48, "assets\\2k_moon.jpg");
+	//m_sphere3 = new Sphere(48, "assets\\2k_moon.jpg");
 
+	planets = {
+		{ "Mercury", 2.0f, 4.74f, 10.83f, 0.2f, 0.01f, "assets/Mercury.jpg" },
+		{ "Venus",   3.0f, 3.5f, -6.52f, 0.45f, 177.4f, "assets/Venus.jpg" },
+		{ "Earth",   4.0f, 2.98f, 15.0f, 0.5f, 23.5f, "assets/2k_earth_daymap.jpg" },
+		{ "Mars",    5.0f, 2.41f, 14.6f, 0.35f, 25.0f, "assets/Mars.jpg" },
+		{ "Jupiter", 7.0f, 1.31f, 25.0f, 1.0f, 3.1f, "assets/Jupiter.jpg" },
+		{ "Saturn",  9.0f, 0.97f, 22.0f, 0.9f, 26.7f, "assets/Saturn.jpg" },
+		{ "Uranus",  11.0f, 0.68f, -17.2f, 0.7f, 97.8f, "assets/Uranus.jpg" },
+		{ "Neptune", 13.0f, 0.54f, 16.1f, 0.65f, 28.3f, "assets/Neptune.jpg" }
+	};
+
+	for (const auto& p : planets) {
+		Sphere* s = new Sphere(48, p.texturePath.c_str());
+		planetSpheres.push_back(s);
+	}
+
+	// Earth's Moon
+	moons.push_back({ 2, new Sphere(32, "assets/2k_moon.jpg"), 1.5f, 3.0f, 0.2f, 30.f, "" });
+
+
+	// Mars: Phobos & Deimos
+	moons.push_back({ 3, new Sphere(32, "assets/Mercury.jpg"), 0.6f, 4.5f, 0.05f, 20.f, "" });  // Phobos-like
+	moons.push_back({ 3, new Sphere(32, "assets/Mercury.jpg"), 1.0f, 3.2f, 0.07f, -10.f, "" }); // Deimos-like
+
+	// Jupiter: Europa & Ganymede
+	moons.push_back({ 4, new Sphere(32, "assets/Mercury.jpg"), 1.5f, 3.0f, 0.1f, 15.f, "" });   // Europa
+	moons.push_back({ 4, new Sphere(32, "assets/Mercury.jpg"), 2.2f, 2.2f, 0.12f, -15.f, "" });  // Ganymede
 
 
 	//enable depth testing
@@ -111,24 +143,48 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	glm::mat4 sunModel = modelStack.top() * sunRotation * sunScale;
 	m_sphere->Update(sunModel);
 
-	// 2. Planet: orbit sun in x-z plane
-	modelStack.push(modelStack.top());
-	glm::mat4 planetOrbit = glm::rotate(identity, (float)(dt), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
-	glm::mat4 planetTranslate = glm::translate(glm::vec3(5.0f, 0.0f, 0.0f)); // orbit radius
-	glm::mat4 planetRotate = glm::rotate(identity, (float)(dt * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // self-rotation
-	glm::mat4 planetScale = glm::scale(glm::vec3(0.6f));
-	glm::mat4 planetModel = modelStack.top() * planetOrbit * planetTranslate * planetRotate * planetScale;
-	m_sphere2->Update(planetModel);
+	for (size_t i = 0; i < planets.size(); ++i) {
+		const CelestialBody& p = planets[i];
+
+		glm::mat4 orbit = glm::rotate(glm::mat4(1.0f), (float)(dt * p.orbitSpeed), glm::vec3(0, 1, 0));
+		glm::mat4 translate = glm::translate(glm::vec3(p.orbitRadius, 0.0f, 0.0f));
+		glm::mat4 tilt = glm::rotate(glm::mat4(1.0f), glm::radians(p.axialTilt), glm::vec3(0, 0, 1));
+		glm::mat4 spin = glm::rotate(glm::mat4(1.0f), (float)(dt * p.rotationSpeed), glm::vec3(0, 1, 0));
+		glm::mat4 scale = glm::scale(glm::vec3(p.scale));
+
+		glm::mat4 model = modelStack.top() * orbit * translate * tilt * spin * scale;
+		planetSpheres[i]->Update(model);
+	}
+
+	for (Moon& m : moons) {
+		glm::mat4 planetModel = planetSpheres[m.parentPlanetIndex]->GetModel();
+		glm::mat4 moonTilt = glm::rotate(glm::mat4(1.0f), glm::radians(m.tilt), glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 moonOrbit = glm::rotate(glm::mat4(1.0f), (float)(dt * m.orbitSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 moonTranslate = glm::translate(glm::vec3(m.orbitRadius, 0.0f, 0.0f));
+		glm::mat4 moonScale = glm::scale(glm::vec3(m.scale));
+		glm::mat4 moonModel = planetModel * moonTilt * moonOrbit * moonTranslate * moonScale;
+		m.sphere->Update(moonModel);
+	}
+
+
+	//// 2. Planet: orbit sun in x-z plane
+	//modelStack.push(modelStack.top());
+	//glm::mat4 planetOrbit = glm::rotate(identity, (float)(dt), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
+	//glm::mat4 planetTranslate = glm::translate(glm::vec3(5.0f, 0.0f, 0.0f)); // orbit radius
+	//glm::mat4 planetRotate = glm::rotate(identity, (float)(dt * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // self-rotation
+	//glm::mat4 planetScale = glm::scale(glm::vec3(0.6f));
+	//glm::mat4 planetModel = modelStack.top() * planetOrbit * planetTranslate * planetRotate * planetScale;
+	//m_sphere2->Update(planetModel);
 
 	// 3. Moon: orbit planet at a tilted angle
-	modelStack.push(modelStack.top() * planetOrbit * planetTranslate); // move to planet's frame
-	glm::mat4 moonTilt = glm::rotate(identity, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // tilt
-	glm::mat4 moonOrbit = glm::rotate(identity, (float)(dt * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
-	glm::mat4 moonTranslate = glm::translate(glm::vec3(1.5f, 0.0f, 0.0f));
-	glm::mat4 moonScale = glm::scale(glm::vec3(0.2f));
-	glm::mat4 moonModel = modelStack.top() * moonTilt * moonOrbit * moonTranslate * moonScale;
-	m_sphere3->Update(moonModel);
-	modelStack.pop(); // pop moon
+	//modelStack.push(planetSpheres[2]->GetModel()); 
+	//glm::mat4 moonTilt = glm::rotate(identity, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // tilt
+	//glm::mat4 moonOrbit = glm::rotate(identity, (float)(dt * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
+	//glm::mat4 moonTranslate = glm::translate(glm::vec3(1.5f, 0.0f, 0.0f));
+	//glm::mat4 moonScale = glm::scale(glm::vec3(0.2f));
+	//glm::mat4 moonModel = modelStack.top() * moonTilt * moonOrbit * moonTranslate * moonScale;
+	//m_sphere3->Update(moonModel);
+	//modelStack.pop(); // pop moon
 
 	modelStack.pop(); // pop planet
 
@@ -159,7 +215,7 @@ void Graphics::HierarchicalUpdate2(double dt) {
 
 	// Final model matrix
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), shipPos) * orientation * glm::scale(glm::vec3(0.3f));
-	//m_mesh->Update(model);
+
 
 }
 
@@ -233,37 +289,64 @@ void Graphics::Render()
 		}
 	}
 
-	if (m_sphere2 != NULL) {
-		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere2->GetModel()));
-		if (m_sphere2->hasTex) {
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_sphere2->getTextureID());
-			GLuint sampler = m_shader->GetUniformLocation("sp");
-			if (sampler == INVALID_UNIFORM_LOCATION)
-			{
-				printf("Sampler Not found not found\n");
-			}
-			glUniform1i(sampler, 0);
-			m_sphere2->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
-		}
-	}
+	//if (m_sphere2 != NULL) {
+	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere2->GetModel()));
+	//	if (m_sphere2->hasTex) {
+	//		glActiveTexture(GL_TEXTURE0);
+	//		glBindTexture(GL_TEXTURE_2D, m_sphere2->getTextureID());
+	//		GLuint sampler = m_shader->GetUniformLocation("sp");
+	//		if (sampler == INVALID_UNIFORM_LOCATION)
+	//		{
+	//			printf("Sampler Not found not found\n");
+	//		}
+	//		glUniform1i(sampler, 0);
+	//		m_sphere2->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	//	}
+	//}
 
 
 	// Render Moon
-	if (m_sphere3 != NULL) {
-		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere3->GetModel()));
-		if (m_sphere3->hasTex) {
+	//if (m_sphere3 != NULL) {
+	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere3->GetModel()));
+	//	if (m_sphere3->hasTex) {
+	//		glActiveTexture(GL_TEXTURE0);
+	//		glBindTexture(GL_TEXTURE_2D, m_sphere3->getTextureID());
+	//		GLuint sampler = m_shader->GetUniformLocation("sp");
+	//		if (sampler == INVALID_UNIFORM_LOCATION)
+	//		{
+	//			printf("Sampler Not found not found\n");
+	//		}
+	//		glUniform1i(sampler, 0);
+	//		m_sphere3->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	//	}
+	//}
+
+	for (Sphere* planet : planetSpheres) {
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(planet->GetModel()));
+		if (planet->hasTex) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_sphere3->getTextureID());
+			glBindTexture(GL_TEXTURE_2D, planet->getTextureID());
 			GLuint sampler = m_shader->GetUniformLocation("sp");
-			if (sampler == INVALID_UNIFORM_LOCATION)
-			{
-				printf("Sampler Not found not found\n");
+			if (sampler == INVALID_UNIFORM_LOCATION) {
+				printf("Sampler Not found\n");
 			}
 			glUniform1i(sampler, 0);
-			m_sphere3->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 		}
+		planet->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 	}
+
+	for (Moon& m : moons) {
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m.sphere->GetModel()));
+		if (m.sphere->hasTex) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m.sphere->getTextureID());
+			GLuint sampler = m_shader->GetUniformLocation("sp");
+			glUniform1i(sampler, 0);
+		}
+		m.sphere->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	}
+
+
 
 	// Get any errors from OpenGL
 	auto error = glGetError();

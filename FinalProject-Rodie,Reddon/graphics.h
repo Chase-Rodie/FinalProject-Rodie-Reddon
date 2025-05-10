@@ -15,6 +15,33 @@ using namespace std;
 #define numVBOs 2;
 #define numIBs 2;
 
+struct CelestialBody {
+    std::string name;
+    float orbitRadius;
+    float orbitSpeed;
+    float rotationSpeed;
+    float scale;
+    float axialTilt;
+    std::string texturePath;
+};
+
+extern std::vector<CelestialBody> planets;
+extern std::vector<Sphere*> planetSpheres;
+
+struct Moon {
+    int parentPlanetIndex;      
+    Sphere* sphere;
+    float orbitRadius;
+    float orbitSpeed;
+    float scale;
+    float tilt;
+    std::string texturePath;
+};
+
+extern std::vector<Moon> moons;
+
+
+
 
 class Graphics
 {
@@ -54,7 +81,7 @@ private:
 
     Sphere* m_sphere;
     Sphere* m_sphere2;
-    Sphere* m_sphere3;
+    //Sphere* m_sphere3;
 
    
 
