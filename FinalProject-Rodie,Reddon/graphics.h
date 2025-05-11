@@ -98,7 +98,12 @@ private:
     GLint overrideColorLoc;
 
 
-    glm::vec3 currentCometPosition; 
+    glm::vec3 currentCometPosition = glm::vec3(0.0f);
+    glm::vec3 previousCometPosition = glm::vec3(0.0f);
+    glm::vec3 cometVelocity = glm::vec3(0.0f);
+
+    std::deque<glm::vec3> cometTrailPositions;  
+    const size_t maxTrailLength = 50;           
 
 
 

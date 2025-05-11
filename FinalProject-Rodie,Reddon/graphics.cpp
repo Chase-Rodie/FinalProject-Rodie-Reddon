@@ -201,7 +201,7 @@ void main()
 	6.0f,   
 	0.2f,   
 	0.15f,  
-	0.0f    
+	1.0f    
 	};
 
 
@@ -248,11 +248,19 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	}
 
 
-	float x = halleysComet.orbitRadiusA * cos(totalTime * halleysComet.speed);
-	float z = halleysComet.orbitRadiusB * sin(totalTime * halleysComet.speed);
+	float flySpeed = halleysComet.speed;
+	float radiusX = 20.0f;
+	float radiusZ = 35.0f;
+	float angle = totalTime * 0.3f;
+	cometVelocity = glm::normalize(currentCometPosition - previousCometPosition);
+	float x = radiusX * cos(angle);
+	float z = radiusZ * sin(angle);
 
 
-	glm::vec3 cometPos = glm::vec3(x, 0.0f, z);  
+	glm::vec3 cometPos = glm::vec3(x, 0.0f, z);
+
+
+
 	//std::cout << "[Comet] Position: ("
 		//<< cometPos.x << ", "
 		//<< cometPos.y << ", "
@@ -367,20 +375,20 @@ halleysComet.body->Update(cometModel);
 		glUniform1i(sampler, 0);
 	}
 
-	// Render with correct attribute locations
-	debugCamSphere.Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 
 
 
 	m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
+	std::cout << "[Comet] x: " << x << " z: " << z << " totalTime: " << totalTime << "\n";
 
-	glm::vec3 relativeCamPos = cameraPos - finalShipPos;
-	std::cout << "[Camera] ShipPos: (" << finalShipPos.x << ", " << finalShipPos.y << ", " << finalShipPos.z << ")"
-		<< " | CameraPos: (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")"
-		<< " | Relative: (" << relativeCamPos.x << ", " << relativeCamPos.y << ", " << relativeCamPos.z << ")" << std::endl;
+	previousCometPosition = currentCometPosition;
 
+	// Update the comet trail
+	cometTrailPositions.push_front(currentCometPosition);  // new head of the trail
 
-
+	// Keep only the most recent N positions
+	if (cometTrailPositions.size() > maxTrailLength)
+		cometTrailPositions.pop_back();
 
 
 
@@ -541,7 +549,7 @@ void Graphics::Render()
 		GLuint sampler = m_shader->GetUniformLocation("sp");
 		glUniform1i(sampler, 0);
 	}
-	halleysComet.body->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	//halleysComet.body->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 
 	RenderCometTail(currentCometPosition, glm::vec3(0.0f)); 
 
@@ -665,39 +673,54 @@ glm::mat4 Graphics::GetStarshipModelMatrix() const {
 
 void Graphics::RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPos)
 {
-	glm::vec3 tailDir = glm::normalize(cometPos - sunPos);
-	glm::vec3 tailEnd = cometPos + tailDir * 2.0f;
+	if (cometTrailPositions.size() < 2) return;
 
-	GLfloat tailVertices[] = {
-		cometPos.x, cometPos.y, cometPos.z,
-		tailEnd.x, tailEnd.y, tailEnd.z
-	};
+	glDisable(GL_DEPTH_TEST); // draw over things if needed
 
-	GLuint tailVAO, tailVBO;
-	glGenVertexArrays(1, &tailVAO);
-	glGenBuffers(1, &tailVBO);
+	glLineWidth(6.0f);  
 
-	glBindVertexArray(tailVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(tailVertices), tailVertices, GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(m_positionAttrib);
-	glVertexAttribPointer(m_positionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	for (size_t i = 0; i < cometTrailPositions.size() - 1; ++i)
+	{
+		const glm::vec3& start = cometTrailPositions[i];
+		const glm::vec3& end = cometTrailPositions[i + 1];
 
-	glUniform1i(m_hasTexture, false);
-	glUniform3f(overrideColorLoc, 1.0f, 1.0f, 0.2f);  // yellow tail
+		// Fade from yellow to transparent black
+		float alpha = 1.0f - static_cast<float>(i) / cometTrailPositions.size();
+		glm::vec3 color = glm::mix(glm::vec3(1.0f, 1.0f, 0.2f), glm::vec3(0.0f), 1.0f - alpha);
 
-	glDrawArrays(GL_LINES, 0, 2);
+		GLfloat tailVertices[] = {
+			start.x, start.y, start.z,
+			end.x,   end.y,   end.z
+		};
 
-	// Reset override color so it doesn't affect other objects
-	glUniform3f(overrideColorLoc, 0.0f, 0.0f, 0.0f);
+		GLuint tailVAO, tailVBO;
+		glGenVertexArrays(1, &tailVAO);
+		glGenBuffers(1, &tailVBO);
 
-	glDisableVertexAttribArray(m_positionAttrib);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-	glDeleteBuffers(1, &tailVBO);
-	glDeleteVertexArrays(1, &tailVAO);
+		glBindVertexArray(tailVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(tailVertices), tailVertices, GL_STATIC_DRAW);
+
+		glEnableVertexAttribArray(m_positionAttrib);
+		glVertexAttribPointer(m_positionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+		glUniform1i(m_hasTexture, false);
+		glUniform3f(overrideColorLoc, color.r, color.g, color.b); // faded color
+
+		glDrawArrays(GL_LINES, 0, 2);
+
+		glDisableVertexAttribArray(m_positionAttrib);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		glDeleteBuffers(1, &tailVBO);
+		glDeleteVertexArrays(1, &tailVAO);
+	}
+
+	glUniform3f(overrideColorLoc, 0.0f, 0.0f, 0.0f); // reset
+	glEnable(GL_DEPTH_TEST);  // restore
 }
+
 
 GLuint Graphics::loadCubemap(std::vector<std::string> faces) {
 	GLuint textureID;

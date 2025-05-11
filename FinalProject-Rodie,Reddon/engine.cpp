@@ -1,4 +1,4 @@
-#include "engine.h"
+﻿#include "engine.h"
 #include "glm/ext.hpp"
 
 Engine::Engine(const char* name, int width, int height)
@@ -190,15 +190,12 @@ long long Engine::GetCurrentTimeMillis()
 }
 
 void Engine::Display(GLFWwindow* window, double time) {
-
-    m_graphics->Render();
-    m_window->Swap();
-    m_graphics->HierarchicalUpdate2(deltaTime);
+    m_graphics->HierarchicalUpdate2(deltaTime);  // Update transforms
 
     if (currentMode == GameMode::Exploration) {
         glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
         glm::vec3 shipPos = glm::vec3(shipModel[3]);
-        glm::vec3 shipForward = -glm::normalize(glm::vec3(shipModel[2])); // ship�s local forward is -Z
+        glm::vec3 shipForward = -glm::normalize(glm::vec3(shipModel[2])); // ship’s local forward is -Z
         glm::vec3 shipUp = glm::normalize(glm::vec3(shipModel[1]));
 
         float distanceBack = 2.5f;
@@ -210,7 +207,12 @@ void Engine::Display(GLFWwindow* window, double time) {
         cam->SetTarget(shipPos);
         cam->SetUp(shipUp);
     }
+
+    m_graphics->Render();     // ✅ Use updated camera/view
+    m_window->Swap();
 }
+
+
 
 void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
