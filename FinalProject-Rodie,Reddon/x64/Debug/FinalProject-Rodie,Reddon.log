@@ -4,5 +4,5 @@ C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\
   
 C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(247,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
 C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(247,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(300,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(346,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
