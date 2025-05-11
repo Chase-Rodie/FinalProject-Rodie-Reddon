@@ -1,4 +1,4 @@
-#include "camera.h"
+﻿#include "camera.h"
 
 Camera::Camera()
 {
@@ -109,6 +109,15 @@ void Camera::SetUp(const glm::vec3& upVec) {
     UpdateView();
 }
 
+void Camera::SetLookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up) {
+    cameraPos = eye;
+    cameraFront = glm::normalize(center - eye);
+    cameraUp = up;
+    cameraRight = glm::normalize(glm::cross(cameraFront, up));
+    view = glm::lookAt(eye, center, up);
+}
+
+
 
 
 void Camera::FaceDirection(const glm::vec3& target)
@@ -120,3 +129,6 @@ void Camera::FaceDirection(const glm::vec3& target)
 
     updateCameraVectors();
 }
+
+
+

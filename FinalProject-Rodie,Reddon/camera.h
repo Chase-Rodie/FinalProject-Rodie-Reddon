@@ -16,6 +16,8 @@ public:
     void ProcessMouseScroll(float yoffset);
     void UpdateView();
     void FaceDirection(const glm::vec3& target);
+    void SetLookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
+
 
 
     glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 10.0f);

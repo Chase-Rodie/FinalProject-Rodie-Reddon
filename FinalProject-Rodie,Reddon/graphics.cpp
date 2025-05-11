@@ -311,30 +311,78 @@ halleysComet.body->Update(cometModel);
 
 	modelStack.pop(); // pop planet
 
-	// 4. Starship: orbit in Y-Z plane and point toward sun
-	float starshipAngle = static_cast<float>(totalTime * 0.8f);
-	float orbitRadius = 14.0f; 
+	// 4. Starship: orbit in Y-Z plane and point toward sun (independent of model stack)
+	//float starshipAngle = static_cast<float>(totalTime * 0.8f);
+	//float orbitRadius = 14.0f;
 
-	// Position in Y-Z plane (X = 0)
-	glm::vec3 shipPos = glm::vec3(0.0f, orbitRadius * sin(starshipAngle), orbitRadius * cos(starshipAngle));
-	glm::vec3 sunPos = glm::vec3(0.0f);
+	//// Position relative to world origin (not from modelStack)
+	//glm::vec3 shipPos = glm::vec3(0.0f, 0.0f, -20.0f); // just place it somewhere in space
+	//glm::vec3 sunPos = glm::vec3(0.0f);
 
-	// Forward direction from ship to sun
-	glm::vec3 forward = glm::normalize(sunPos - shipPos);
+	//// Calculate orientation to face the Sun
+	//glm::vec3 shipForward = glm::vec3(0.0f, 0.0f, 1.0f); // optional: define forward
+	//glm::vec3 shipRight = glm::vec3(1.0f, 0.0f, 0.0f);
+	//glm::vec3 shipUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-	// Fixed right direction in X, since we're orbiting Y-Z plane
-	glm::vec3 shipRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), cometForward));
-	glm::vec3 shipUp = glm::normalize(glm::cross(cometForward, cometRight));
+	//glm::mat4 shipOrientation = glm::mat4(1.0f);
+	//shipOrientation[0] = glm::vec4(shipRight, 0.0f);
+	//shipOrientation[1] = glm::vec4(shipUp, 0.0f);
+	//shipOrientation[2] = glm::vec4(-shipForward, 0.0f); // Note: negative forward to match camera look
+	//shipOrientation[3] = glm::vec4(0, 0, 0, 1);
 
-	glm::mat4 shipOrientation = glm::mat4(1.0f);
-	shipOrientation[0] = glm::vec4(cometRight, 0.0f);
-	shipOrientation[1] = glm::vec4(cometUp, 0.0f);
-	shipOrientation[2] = glm::vec4(cometForward, 0.0f);
-	shipOrientation[3] = glm::vec4(0, 0, 0, 1);
+	//// Final model matrix for starship
+	//glm::mat4 shipModel = glm::translate(glm::mat4(1.0f), shipPos)
+	//	* shipOrientation
+	//	* glm::scale(glm::vec3(0.3f));
 
-	// Final model matrix
-	glm::mat4 model = glm::translate(glm::mat4(1.0f), shipPos) * orientation * glm::scale(glm::vec3(0.3f));
-	//m_mesh->Update(model);
+	//m_mesh->Update(shipModel);
+
+
+
+	// Place the camera behind and above the ship
+	glm::mat4 shipModel = m_mesh->GetModel();
+	glm::vec3 finalShipPos = glm::vec3(shipModel[3]);
+	glm::vec3 finalForward = -glm::normalize(glm::vec3(shipModel[2]));
+	glm::vec3 finalUp = glm::normalize(glm::vec3(shipModel[1]));
+
+
+	glm::vec3 cameraOffset = finalForward * -40.0f + finalUp * 10.0f;
+	glm::vec3 cameraPos = finalShipPos + cameraOffset;
+	m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
+
+
+	// Debug sphere to visualize the camera position
+	Sphere debugCamSphere(16, "assets/debug.jpg");  // Make sure this texture exists
+	glm::mat4 debugModel = glm::translate(glm::mat4(1.0f), cameraPos) * glm::scale(glm::vec3(0.1f));
+	debugCamSphere.Update(debugModel);
+
+	// Send model matrix to shader
+	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(debugCamSphere.GetModel()));
+
+	// Bind texture
+	if (debugCamSphere.hasTex) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, debugCamSphere.getTextureID());
+		GLuint sampler = m_shader->GetUniformLocation("sp");
+		glUniform1i(sampler, 0);
+	}
+
+	// Render with correct attribute locations
+	debugCamSphere.Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+
+
+
+	m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
+
+	glm::vec3 relativeCamPos = cameraPos - finalShipPos;
+	std::cout << "[Camera] ShipPos: (" << finalShipPos.x << ", " << finalShipPos.y << ", " << finalShipPos.z << ")"
+		<< " | CameraPos: (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")"
+		<< " | Relative: (" << relativeCamPos.x << ", " << relativeCamPos.y << ", " << relativeCamPos.z << ")" << std::endl;
+
+
+
+
+
 
 
 }

@@ -198,17 +198,17 @@ void Engine::Display(GLFWwindow* window, double time) {
     if (currentMode == GameMode::Exploration) {
         glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
         glm::vec3 shipPos = glm::vec3(shipModel[3]);
-        glm::vec3 forward = glm::normalize(glm::vec3(shipModel[2]));
-        glm::vec3 up = glm::normalize(glm::vec3(shipModel[1]));
+        glm::vec3 shipForward = -glm::normalize(glm::vec3(shipModel[2])); // ship’s local forward is -Z
+        glm::vec3 shipUp = glm::normalize(glm::vec3(shipModel[1]));
 
         float distanceBack = 2.5f;
         float distanceUp = 0.5f;
-        glm::vec3 camWorldPos = shipPos - forward * distanceBack + up * distanceUp;
+        glm::vec3 camWorldPos = shipPos + shipForward * distanceBack + shipUp * distanceUp;
 
         Camera* cam = m_graphics->getCamera();
         cam->SetPosition(camWorldPos);
         cam->SetTarget(shipPos);
-        cam->SetUp(up);
+        cam->SetUp(shipUp);
     }
 }
 

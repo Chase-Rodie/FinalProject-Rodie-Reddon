@@ -212,10 +212,15 @@ void Mesh::Rotate(float pitch, float yaw, float roll)
 	rotation = glm::rotate(rotation, glm::radians(pitch), glm::vec3(1, 0, 0));
 	rotation = glm::rotate(rotation, glm::radians(yaw), glm::vec3(0, 1, 0));
 
-	model = model * rotation;
+	glm::vec3 position = glm::vec3(model[3]);
+	model[3] = glm::vec4(0, 0, 0, 1);
+	model = rotation * model;
+	model[3] = glm::vec4(position, 1.0f);
 }
+
 
 void Mesh::MoveForward(float amount) {
 	glm::vec3 forward = glm::normalize(glm::vec3(model[2]));
 	model = glm::translate(model, forward * amount);
+
 }
