@@ -92,7 +92,7 @@ void Engine::ProcessInput()
             cam->ProcessKeyboard("RIGHT", camSpeed);
     }
     //exploration mode
-    else if(currentMode == GameMode::Exploration){
+    else if (currentMode == GameMode::Exploration) {
         Mesh* ship = m_graphics->getMesh();
 
         float shipSpeed = 65.0f * deltaTime;
@@ -108,11 +108,11 @@ void Engine::ProcessInput()
             ship->Rotate(0.0f, 60.0f * deltaTime, 0.0f); // turn left
         if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
             ship->Rotate(0.0f, -60.0f * deltaTime, 0.0f); // turn right
-    
+
     }
 
     bool tabPressed = glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS;
- 
+
     if (glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS) {
         if (tabPressed && !tabPressedLastFrame) {
             tabPressedLastFrame = true;
@@ -154,11 +154,11 @@ void Engine::ProcessInput()
             }
         }
     }
-        if (!tabPressed) {
-            tabPressedLastFrame = false;
-        }
+    if (!tabPressed) {
+        tabPressedLastFrame = false;
+    }
 
-    
+
 
 }
 
@@ -190,29 +190,27 @@ long long Engine::GetCurrentTimeMillis()
 }
 
 void Engine::Display(GLFWwindow* window, double time) {
-    m_graphics->HierarchicalUpdate2(deltaTime);  // Update transforms
+
+    m_graphics->Render();
+    m_window->Swap();
+    m_graphics->HierarchicalUpdate2(deltaTime);
 
     if (currentMode == GameMode::Exploration) {
         glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
         glm::vec3 shipPos = glm::vec3(shipModel[3]);
-        glm::vec3 shipForward = -glm::normalize(glm::vec3(shipModel[2])); // ship’s local forward is -Z
-        glm::vec3 shipUp = glm::normalize(glm::vec3(shipModel[1]));
+        glm::vec3 forward = glm::normalize(glm::vec3(shipModel[2]));
+        glm::vec3 up = glm::normalize(glm::vec3(shipModel[1]));
 
         float distanceBack = 2.5f;
         float distanceUp = 0.5f;
-        glm::vec3 camWorldPos = shipPos + shipForward * distanceBack + shipUp * distanceUp;
+        glm::vec3 camWorldPos = shipPos - forward * distanceBack + up * distanceUp;
 
         Camera* cam = m_graphics->getCamera();
         cam->SetPosition(camWorldPos);
         cam->SetTarget(shipPos);
-        cam->SetUp(shipUp);
+        cam->SetUp(up);
     }
-
-    m_graphics->Render();     // ✅ Use updated camera/view
-    m_window->Swap();
 }
-
-
 
 void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -239,4 +237,3 @@ void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double yp
         cam->ProcessMouseMovement(xoffset, yoffset);  // Only rotate while dragging
     }
 }
-
