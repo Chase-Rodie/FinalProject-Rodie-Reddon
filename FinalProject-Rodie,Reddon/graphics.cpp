@@ -1,7 +1,9 @@
-﻿#include "graphics.h"
+#include "graphics.h"
+#include <glm/gtx/string_cast.hpp> // for glm::to_string
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
+
 std::vector<CelestialBody> planets;
 std::vector<Sphere*> planetSpheres;
 std::vector<Moon> moons;
@@ -161,8 +163,16 @@ void main()
 	// The Sun
 	m_sphere = new Sphere(64, "assets\\2k_sun.jpg");
 
+	// Create a single asteroid mesh
+	m_asteroid = new Mesh(glm::vec3(0.0f), "assets\\asteroid.obj", "assets\\asteroid.jpg");
+	GenerateAsteroidBelts();
+	SetupAsteroidInstancing(); // <-- Call this here
+
 	// The Earth
 	//m_sphere2 = new Sphere(48, "assets\\2k_earth_daymap.jpg");
+
+	// Repeat for outer VBO if desired � OR reuse the same VAO if using same mesh
+
 
 	// The moon
 	//m_sphere3 = new Sphere(48, "assets\\2k_moon.jpg");
@@ -464,6 +474,95 @@ void Graphics::Render()
 		m_mesh->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 	}
 
+	// Debug: Draw first 50 asteroids individually (no instancing)
+	int count = std::min(100, static_cast<int>(innerAsteroidTransforms.size()));
+	for (int i = 0; i < count; ++i) {
+		m_asteroid->Update(innerAsteroidTransforms[i]);
+
+		glUniform1i(m_shader->GetUniformLocation("isInstanced"), false);
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_asteroid->GetModel()));
+
+		if (m_asteroid->hasTex) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_asteroid->getTextureID());
+			GLuint sampler = m_shader->GetUniformLocation("sp");
+			glUniform1i(sampler, 0);
+		}
+
+		m_asteroid->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	}
+
+
+	//if (!innerAsteroidTransforms.empty()) {
+	//	GLint isInstancedLoc = m_shader->GetUniformLocation("isInstanced");
+	//	glUniform1i(isInstancedLoc, true);
+	//	glUniform1i(m_hasTexture, true);
+	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
+	//	// Bind texture
+	//	glActiveTexture(GL_TEXTURE0);
+	//	glBindTexture(GL_TEXTURE_2D, m_asteroid->getTextureID());
+	//	GLuint sampler = m_shader->GetUniformLocation("sp");
+	//	glUniform1i(sampler, 0);
+
+	//	// Bind VAO and instance buffer
+	//	glBindVertexArray(m_asteroid->getVAO());
+	//	glBindBuffer(GL_ARRAY_BUFFER, innerAsteroidVBO);
+
+	//	// Set up per-instance matrix attributes (locations 3�6)
+	//	for (int i = 0; i < 4; ++i) {
+	//		glEnableVertexAttribArray(3 + i);
+	//		glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * i * 4));
+	//		glVertexAttribDivisor(3 + i, 1);
+	//	}
+
+	//	// Draw
+	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_asteroid->getIBO());
+	//	glDrawElementsInstanced(GL_TRIANGLES, m_asteroid->GetIndexCount(), GL_UNSIGNED_INT, 0, innerAsteroidTransforms.size());
+
+	//	// Reset instanced flag
+	//	glUniform1i(isInstancedLoc, false);
+	//}
+
+	
+	if (!innerAsteroidTransforms.empty()) {
+		GLint isInstancedLoc = m_shader->GetUniformLocation("isInstanced");
+		glUniform1i(isInstancedLoc, true);
+		glUniform1i(m_hasTexture, true);
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_asteroid->getTextureID());
+		GLuint sampler = m_shader->GetUniformLocation("sp");
+		glUniform1i(sampler, 0);
+
+		glBindVertexArray(m_asteroid->getVAO());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_asteroid->getIBO());
+
+		glDrawElementsInstanced(GL_TRIANGLES, m_asteroid->GetIndexCount(), GL_UNSIGNED_INT, 0, innerAsteroidTransforms.size());
+
+		glUniform1i(isInstancedLoc, false);  // reset
+	}
+
+	
+	
+	int outerCount = std::min(10000, static_cast<int>(outerAsteroidTransforms.size()));
+	for (int i = 0; i < outerCount; ++i) {
+		glm::mat4 scaled = outerAsteroidTransforms[i] * glm::scale(glm::vec3(1.0f)); // or whatever size you want
+		m_asteroid->Update(scaled);
+
+		glUniform1i(m_shader->GetUniformLocation("isInstanced"), false);
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_asteroid->GetModel()));
+
+		if (m_asteroid->hasTex) {
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, m_asteroid->getTextureID());
+			GLuint sampler = m_shader->GetUniformLocation("sp");
+			glUniform1i(sampler, 0);
+		}
+
+		m_asteroid->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+	}
 
 	/*if (m_pyramid != NULL) {
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_pyramid->GetModel()));
@@ -771,4 +870,57 @@ GLuint Graphics::loadCubemap(std::vector<std::string> faces) {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 	return textureID;
+}
+void Graphics::GenerateAsteroidBelts() {
+	const int numInner = 800, numOuter = 800;
+	float innerMin = 6.5f, innerMax = 7.0f;
+	float outerMin = 16.0f, outerMax = 17.0f;
+
+	auto generateBelt = [](int count, float minRadius, float maxRadius, std::vector<glm::mat4>& transforms) {
+		for (int i = 0; i < count; ++i) {
+			float angle = glm::radians((float)(rand() % 360));
+			float radius = minRadius + static_cast <float>(rand()) / (static_cast <float>(RAND_MAX / (maxRadius - minRadius)));
+			float height = ((rand() % 100) / 100.0f - 0.5f) * 0.5f; // small Y offset
+
+			glm::vec3 position = glm::vec3(cos(angle) * radius, height, sin(angle) * radius);
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+			model = glm::scale(model, glm::vec3(0.05f));
+
+			transforms.push_back(model);
+		}
+		};
+
+	generateBelt(numInner, innerMin, innerMax, innerAsteroidTransforms);
+	generateBelt(numOuter, outerMin, outerMax, outerAsteroidTransforms);
+	if (!innerAsteroidTransforms.empty()) {
+		std::cout << "First inner asteroid matrix:\n";
+		const glm::mat4& mat = innerAsteroidTransforms[0];
+		for (int i = 0; i < 4; ++i) {
+			std::cout << glm::to_string(mat[i]) << "\n";
+		}
+	}
+}
+
+
+void Graphics::SetupAsteroidInstancing() {
+	// Generate buffers
+	glGenBuffers(1, &innerAsteroidVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, innerAsteroidVBO);
+	glBufferData(GL_ARRAY_BUFFER, innerAsteroidTransforms.size() * sizeof(glm::mat4), innerAsteroidTransforms.data(), GL_STATIC_DRAW);
+
+	// Bind VAO for the asteroid mesh
+	glBindVertexArray(m_asteroid->getVAO());
+
+	// Bind the instance buffer before defining attributes
+	glBindBuffer(GL_ARRAY_BUFFER, innerAsteroidVBO);
+
+	// Set up mat4 as 4 vec4s
+	for (int i = 0; i < 4; ++i) {
+		glEnableVertexAttribArray(3 + i);
+		glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * i * 4));
+		glVertexAttribDivisor(3 + i, 1);  // Advance per instance
+	}
+
+	// Unbind VAO to avoid accidental overwrites
+	glBindVertexArray(0);
 }

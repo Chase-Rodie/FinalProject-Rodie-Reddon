@@ -62,7 +62,10 @@ public:
     bool Initialize(int width, int height);
     void HierarchicalUpdate2(double dt);
     void Render();
+    void GenerateAsteroidBelts();
     glm::mat4 GetStarshipModelMatrix() const;
+    void SetupAsteroidInstancing();
+  
 
     Camera* getCamera() { return m_camera; }
     Mesh* getMesh() { return m_mesh; }
@@ -83,6 +86,11 @@ private:
     Camera* m_camera;
     Shader* m_shader;
     Mesh* m_mesh;
+    Mesh* m_asteroid;
+
+    std::vector<glm::mat4> innerAsteroidTransforms;
+    std::vector<glm::mat4> outerAsteroidTransforms;
+
 
     GLint m_projectionMatrix;
     GLint m_viewMatrix;
@@ -91,6 +99,7 @@ private:
     GLint m_colorAttrib;
     GLint m_tcAttrib;
     GLint m_hasTexture;
+    GLuint innerAsteroidVBO, outerAsteroidVBO;
 
     double totalTime = 0.0; 
 
@@ -110,6 +119,12 @@ private:
 
     Sphere* m_sphere;
     Sphere* m_sphere2;
+   
+    //Sphere* m_sphere3;
+
+   
+
+
 
     // Skybox members
     GLuint skyboxVAO, skyboxVBO;
