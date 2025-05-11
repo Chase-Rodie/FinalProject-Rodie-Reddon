@@ -16,7 +16,8 @@ public:
     void Update(glm::mat4 model);
     void Render(GLint posAttrib, GLint colAttrib);
     void Render(GLint positionAttribLoc, GLint colorAttribLoc, GLint tcAttribLoc, GLint hasTex);
-    void Rotate(float pitch, float yaw, float roll);
+    void Rotate(float 
+        , float yaw, float roll);
     void MoveForward(float amount);
 
     glm::mat4 GetModel();

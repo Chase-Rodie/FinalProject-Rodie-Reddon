@@ -24,6 +24,9 @@ public:
     std::vector<glm::vec2> getTexCoords();
     std::vector<glm::vec3> getNormals();
 
+    glm::vec3 GetPosition() const;
+
+
     GLuint getTextureID() { return m_texture->getTextureID(); }
 
     bool hasTex;

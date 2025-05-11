@@ -67,18 +67,21 @@ bool Shader::AddShader(GLenum ShaderType)
     \
     uniform sampler2D sp; \
     uniform bool hasTexture; \
+    uniform vec3 overrideColor; \
     \
     out vec4 frag_color; \
     \
     void main(void) \
     { \
-        if (hasTexture) \
+        if (overrideColor != vec3(0.0)) \
+            frag_color = vec4(overrideColor, 1.0); \
+        else if (hasTexture) \
             frag_color = texture(sp, tc); \
         else \
             frag_color = vec4(color, 1.0); \
     }";
-
     }
+
 
     GLuint ShaderObj = glCreateShader(ShaderType);
 
@@ -181,4 +184,33 @@ GLint Shader::GetAttribLocation(const char* pAttribName)
 
     return Location;
 }
+
+bool Shader::AddShader(GLenum ShaderType, const char* shaderSource)
+{
+    GLuint ShaderObj = glCreateShader(ShaderType);
+    if (ShaderObj == 0)
+    {
+        std::cerr << "Error creating shader type " << ShaderType << std::endl;
+        return false;
+    }
+
+    m_shaderObjList.push_back(ShaderObj);
+
+    glShaderSource(ShaderObj, 1, &shaderSource, NULL);
+    glCompileShader(ShaderObj);
+
+    GLint success;
+    glGetShaderiv(ShaderObj, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        GLchar InfoLog[1024];
+        glGetShaderInfoLog(ShaderObj, 1024, NULL, InfoLog);
+        std::cerr << "Error compiling shader: " << InfoLog << std::endl;
+        return false;
+    }
+
+    glAttachShader(m_shaderProg, ShaderObj);
+    return true;
+}
+
 

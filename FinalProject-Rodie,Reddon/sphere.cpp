@@ -145,6 +145,11 @@ void Sphere::Update(glm::mat4 matModel) {
 
 }
 
+glm::vec3 Sphere::GetPosition() const {
+    return glm::vec3(model[3]);
+}
+
+
 float Sphere::toRadians(float degrees) { return (degrees * 2.0f * 3.14159f) / 360.0f; }
 
 void Sphere::init(int prec) {
@@ -178,6 +183,8 @@ void Sphere::init(int prec) {
         }
     }
 }
+
+
 
 // accessors
 int Sphere::getNumVertices() { return numVertices; }

@@ -193,7 +193,7 @@ void Engine::Display(GLFWwindow* window, double time) {
 
     m_graphics->Render();
     m_window->Swap();
-    m_graphics->HierarchicalUpdate2(time);
+    m_graphics->HierarchicalUpdate2(deltaTime);
 
     if (currentMode == GameMode::Exploration) {
         glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();

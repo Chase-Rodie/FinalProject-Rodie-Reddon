@@ -1,12 +1,7 @@
-﻿  engine.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(180,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(228,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(229,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  graphics.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(237,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(237,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  main.cpp
-  Generating Code...
+﻿  graphics.cpp
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(251,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(252,10): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(357,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(357,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(678,17): warning C4566: character represented by universal-character-name '\u274C' cannot be represented in the current code page (1252)
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe

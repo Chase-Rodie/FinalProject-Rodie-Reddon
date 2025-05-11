@@ -1,7 +1,12 @@
-#include "graphics.h"
+﻿#include "graphics.h"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 std::vector<CelestialBody> planets;
 std::vector<Sphere*> planetSpheres;
 std::vector<Moon> moons;
+Comet halleysComet;
+
 
 
 
@@ -80,6 +85,72 @@ bool Graphics::Initialize(int width, int height)
 		printf("Some shader attribs not located!\n");
 	}
 
+	// Skybox Shader
+	skyboxShader = new Shader();
+	skyboxShader->Initialize();
+	const char* skyboxVertexShader = R"(
+#version 460
+layout (location = 0) in vec3 aPos;
+out vec3 TexCoords;
+uniform mat4 projection;
+uniform mat4 view;
+void main()
+{
+    TexCoords = aPos;
+    vec4 pos = projection * view * vec4(aPos, 1.0);
+    gl_Position = pos.xyww;
+}
+)";
+
+	const char* skyboxFragmentShader = R"(
+#version 460
+in vec3 TexCoords;
+out vec4 FragColor;
+uniform samplerCube skybox;
+void main()
+{
+    FragColor = texture(skybox, TexCoords);
+}
+)";
+
+	skyboxShader->AddShader(GL_VERTEX_SHADER, skyboxVertexShader);
+	skyboxShader->AddShader(GL_FRAGMENT_SHADER, skyboxFragmentShader);
+
+	skyboxShader->Finalize();
+
+	float skyboxVertices[] = {
+		-1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f
+	};
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	std::vector<std::string> faces = {
+		"assets/skybox_right.jpg",   // POSITIVE_X
+		"assets/skybox_left.jpg",    // NEGATIVE_X
+		"assets/skybox_top.jpg",     // POSITIVE_Y
+		"assets/skybox_bottom.jpg",  // NEGATIVE_Y
+		"assets/skybox_front.jpg",   // POSITIVE_Z
+		"assets/skybox_back.jpg"     // NEGATIVE_Z
+	};
+	cubemapTexture = loadCubemap(faces);
+
+
 	// Starship
 	m_mesh = new Mesh(glm::vec3(0.0f), "assets\\SpaceShip-1.obj", "assets\\SpaceShip-1.png");
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -20.0f)) *
@@ -124,6 +195,15 @@ bool Graphics::Initialize(int width, int height)
 	moons.push_back({ 4, new Sphere(32, "assets/Mercury.jpg"), 1.5f, 3.0f, 0.1f, 15.f, "" });   // Europa
 	moons.push_back({ 4, new Sphere(32, "assets/Mercury.jpg"), 2.2f, 2.2f, 0.12f, -15.f, "" });  // Ganymede
 
+	halleysComet = {
+	new Sphere(32, "assets/2k_moon.jpg"),
+	20.0f,  
+	6.0f,   
+	0.2f,   
+	0.15f,  
+	0.0f    
+	};
+
 
 	//enable depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -133,12 +213,13 @@ bool Graphics::Initialize(int width, int height)
 }
 
 void Graphics::HierarchicalUpdate2(double dt) {
-	modelStack = std::stack<glm::mat4>(); // clear stack
+	totalTime += dt;  
+	modelStack = std::stack<glm::mat4>();
 	glm::mat4 identity = glm::mat4(1.0f);
 	modelStack.push(identity);
 
 	// 1. Sun: rotate in place at origin
-	glm::mat4 sunRotation = glm::rotate(identity, (float)(dt * 0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 sunRotation = glm::rotate(identity, (float)(totalTime * 0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
 	glm::mat4 sunScale = glm::scale(glm::vec3(1.5f)); // slightly bigger sun
 	glm::mat4 sunModel = modelStack.top() * sunRotation * sunScale;
 	m_sphere->Update(sunModel);
@@ -146,10 +227,10 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	for (size_t i = 0; i < planets.size(); ++i) {
 		const CelestialBody& p = planets[i];
 
-		glm::mat4 orbit = glm::rotate(glm::mat4(1.0f), (float)(dt * p.orbitSpeed), glm::vec3(0, 1, 0));
+		glm::mat4 orbit = glm::rotate(glm::mat4(1.0f), (float)(totalTime * p.orbitSpeed), glm::vec3(0, 1, 0));
 		glm::mat4 translate = glm::translate(glm::vec3(p.orbitRadius, 0.0f, 0.0f));
 		glm::mat4 tilt = glm::rotate(glm::mat4(1.0f), glm::radians(p.axialTilt), glm::vec3(0, 0, 1));
-		glm::mat4 spin = glm::rotate(glm::mat4(1.0f), (float)(dt * p.rotationSpeed), glm::vec3(0, 1, 0));
+		glm::mat4 spin = glm::rotate(glm::mat4(1.0f), (float)(totalTime * p.rotationSpeed), glm::vec3(0, 1, 0));
 		glm::mat4 scale = glm::scale(glm::vec3(p.scale));
 
 		glm::mat4 model = modelStack.top() * orbit * translate * tilt * spin * scale;
@@ -159,12 +240,54 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	for (Moon& m : moons) {
 		glm::mat4 planetModel = planetSpheres[m.parentPlanetIndex]->GetModel();
 		glm::mat4 moonTilt = glm::rotate(glm::mat4(1.0f), glm::radians(m.tilt), glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 moonOrbit = glm::rotate(glm::mat4(1.0f), (float)(dt * m.orbitSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 moonOrbit = glm::rotate(glm::mat4(1.0f), (float)(totalTime * m.orbitSpeed), glm::vec3(0.0f, 1.0f, 0.0f));
 		glm::mat4 moonTranslate = glm::translate(glm::vec3(m.orbitRadius, 0.0f, 0.0f));
 		glm::mat4 moonScale = glm::scale(glm::vec3(m.scale));
 		glm::mat4 moonModel = planetModel * moonTilt * moonOrbit * moonTranslate * moonScale;
 		m.sphere->Update(moonModel);
 	}
+
+
+	float x = halleysComet.orbitRadiusA * cos(totalTime * halleysComet.speed);
+	float z = halleysComet.orbitRadiusB * sin(totalTime * halleysComet.speed);
+
+
+	glm::vec3 cometPos = glm::vec3(x, 0.0f, z);  
+	//std::cout << "[Comet] Position: ("
+		//<< cometPos.x << ", "
+		//<< cometPos.y << ", "
+		//<< cometPos.z << ")" << std::endl;
+
+
+	// Comet faces away from the Sun
+	glm::vec3 sunToComet = glm::normalize(cometPos - glm::vec3(0.0f));
+	glm::vec3 cometForward = -sunToComet;  // tail points away
+	glm::vec3 right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), cometForward));
+	glm::vec3 up = glm::normalize(glm::cross(cometForward, right));
+
+	glm::mat4 orientation = glm::mat4(1.0f);
+	orientation[0] = glm::vec4(right, 0.0f);
+	orientation[1] = glm::vec4(up, 0.0f);
+	orientation[2] = glm::vec4(cometForward, 0.0f);
+
+glm::vec3 cometRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), cometForward));
+glm::vec3 cometUp = glm::normalize(glm::cross(cometForward, cometRight));
+
+glm::mat4 cometOrientation = glm::mat4(1.0f);
+cometOrientation[0] = glm::vec4(cometRight, 0.0f);
+cometOrientation[1] = glm::vec4(cometUp, 0.0f);
+cometOrientation[2] = glm::vec4(cometForward, 0.0f);
+cometOrientation[3] = glm::vec4(0, 0, 0, 1);
+currentCometPosition = glm::vec3(x, 0.0f, z);  
+
+glm::mat4 cometModel = glm::translate(glm::mat4(1.0f), cometPos) *
+cometOrientation *
+glm::scale(glm::vec3(1.0f)); // <- Up from 0.15 to 1.0
+halleysComet.body->Update(cometModel);
+
+
+
+
 
 
 	//// 2. Planet: orbit sun in x-z plane
@@ -189,7 +312,7 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	modelStack.pop(); // pop planet
 
 	// 4. Starship: orbit in Y-Z plane and point toward sun
-	float starshipAngle = static_cast<float>(dt * 0.8f);
+	float starshipAngle = static_cast<float>(totalTime * 0.8f);
 	float orbitRadius = 14.0f; 
 
 	// Position in Y-Z plane (X = 0)
@@ -200,21 +323,18 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	glm::vec3 forward = glm::normalize(sunPos - shipPos);
 
 	// Fixed right direction in X, since we're orbiting Y-Z plane
-	glm::vec3 right = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 up = glm::normalize(glm::cross(forward, right));
+	glm::vec3 shipRight = glm::normalize(glm::cross(glm::vec3(0, 1, 0), cometForward));
+	glm::vec3 shipUp = glm::normalize(glm::cross(cometForward, cometRight));
 
-	// Recompute right to ensure full orthonormal basis
-	right = glm::normalize(glm::cross(up, forward));
-
-	// Build orientation matrix (forward = Z axis)
-	glm::mat4 orientation = glm::mat4(1.0f);
-	orientation[0] = glm::vec4(right, 0.0f);
-	orientation[1] = glm::vec4(up, 0.0f);
-	orientation[2] = glm::vec4(forward, 0.0f);  
-	orientation[3] = glm::vec4(0, 0, 0, 1);
+	glm::mat4 shipOrientation = glm::mat4(1.0f);
+	shipOrientation[0] = glm::vec4(cometRight, 0.0f);
+	shipOrientation[1] = glm::vec4(cometUp, 0.0f);
+	shipOrientation[2] = glm::vec4(cometForward, 0.0f);
+	shipOrientation[3] = glm::vec4(0, 0, 0, 1);
 
 	// Final model matrix
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), shipPos) * orientation * glm::scale(glm::vec3(0.3f));
+	//m_mesh->Update(model);
 
 
 }
@@ -236,6 +356,26 @@ void Graphics::Render()
 	//clear the screen
 	glClearColor(0.5, 0.2, 0.2, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// --- SKYBOX ---
+	glDepthFunc(GL_LEQUAL);
+	skyboxShader->Enable();
+
+	glm::mat4 view = glm::mat4(glm::mat3(m_camera->GetView())); // remove translation
+	glm::mat4 projection = m_camera->GetProjection();
+
+	glUniformMatrix4fv(skyboxShader->GetUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(skyboxShader->GetUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform1i(skyboxShader->GetUniformLocation("skybox"), 0);
+
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+
+	glDepthFunc(GL_LESS);  // reset depth
+
 
 	// Start the correct program
 	m_shader->Enable();
@@ -346,6 +486,18 @@ void Graphics::Render()
 		m.sphere->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
 	}
 
+	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(halleysComet.body->GetModel()));
+	if (halleysComet.body->hasTex) {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, halleysComet.body->getTextureID());
+		GLuint sampler = m_shader->GetUniformLocation("sp");
+		glUniform1i(sampler, 0);
+	}
+	halleysComet.body->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+
+	RenderCometTail(currentCometPosition, glm::vec3(0.0f)); 
+
+
 
 
 	// Get any errors from OpenGL
@@ -417,6 +569,13 @@ bool Graphics::collectShPrLocs() {
 		anyProblem = false;
 	}
 
+	overrideColorLoc = m_shader->GetUniformLocation("overrideColor");
+	if (overrideColorLoc == INVALID_UNIFORM_LOCATION) {
+		printf("overrideColor uniform not found\n");
+		anyProblem = false;
+	}
+
+
 	return anyProblem;
 }
 
@@ -456,3 +615,89 @@ glm::mat4 Graphics::GetStarshipModelMatrix() const {
 	return m_mesh->GetModel();
 }
 
+void Graphics::RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPos)
+{
+	glm::vec3 tailDir = glm::normalize(cometPos - sunPos);
+	glm::vec3 tailEnd = cometPos + tailDir * 2.0f;
+
+	GLfloat tailVertices[] = {
+		cometPos.x, cometPos.y, cometPos.z,
+		tailEnd.x, tailEnd.y, tailEnd.z
+	};
+
+	GLuint tailVAO, tailVBO;
+	glGenVertexArrays(1, &tailVAO);
+	glGenBuffers(1, &tailVBO);
+
+	glBindVertexArray(tailVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, tailVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tailVertices), tailVertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(m_positionAttrib);
+	glVertexAttribPointer(m_positionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glUniform1i(m_hasTexture, false);
+	glUniform3f(overrideColorLoc, 1.0f, 1.0f, 0.2f);  // yellow tail
+
+	glDrawArrays(GL_LINES, 0, 2);
+
+	// Reset override color so it doesn't affect other objects
+	glUniform3f(overrideColorLoc, 0.0f, 0.0f, 0.0f);
+
+	glDisableVertexAttribArray(m_positionAttrib);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glDeleteBuffers(1, &tailVBO);
+	glDeleteVertexArrays(1, &tailVAO);
+}
+
+GLuint Graphics::loadCubemap(std::vector<std::string> faces) {
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	for (GLuint i = 0; i < faces.size(); i++) {
+		int width, height;
+		unsigned char* data = SOIL_load_image(faces[i].c_str(), &width, &height, 0, SOIL_LOAD_RGB);
+		if (data) {
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0,
+				GL_RGB,
+				width,
+				height,
+				0,
+				GL_RGB,
+				GL_UNSIGNED_BYTE,
+				data
+			);
+			SOIL_free_image_data(data);
+			std::cout << "Loaded cubemap face: " << faces[i] << std::endl;
+		}
+		else {
+			std::cerr << "❌ Failed to load cubemap texture at: " << faces[i] << std::endl;
+
+			// Fallback: make an empty black texture instead of passing null
+			unsigned char black[] = { 0, 0, 0 };
+			glTexImage2D(
+				GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0,
+				GL_RGB,
+				1,
+				1,
+				0,
+				GL_RGB,
+				GL_UNSIGNED_BYTE,
+				black
+			);
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}

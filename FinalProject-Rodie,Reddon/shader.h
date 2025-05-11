@@ -17,6 +17,9 @@ public:
     GLint GetUniformLocation(const char* pUniformName);
     GLint GetAttribLocation(const char* pAttribName);
 
+    bool AddShader(GLenum ShaderType, const char* shaderSource);
+
+
 
 private:
     GLuint m_shaderProg;
