@@ -58,6 +58,7 @@ bool Shader::AddShader(GLenum ShaderType)
         tc = v_tc; \
     }";
 
+
     }
     else if (ShaderType == GL_FRAGMENT_SHADER)
     {

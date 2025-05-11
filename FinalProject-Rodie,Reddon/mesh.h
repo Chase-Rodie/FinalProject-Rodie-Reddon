@@ -25,8 +25,10 @@ public:
     bool loadModelFromFile(const char* path);
 
     bool hasTex;
+    GLuint getIBO() const { return IB; }
     GLuint getTextureID() { return m_texture->getTextureID(); }
-
+    GLuint getVAO() const { return vao; }
+    int GetIndexCount() const { return Indices.size(); }
 
 
 private:

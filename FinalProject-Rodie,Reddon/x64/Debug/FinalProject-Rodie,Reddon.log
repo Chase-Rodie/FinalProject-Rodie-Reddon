@@ -1,12 +1,8 @@
-﻿  engine.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(180,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(228,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(229,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  graphics.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(237,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(237,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-  main.cpp
-  Generating Code...
-  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
+﻿  graphics.cpp
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(31,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'graphics.cpp')
+  
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(247,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(247,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(300,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
