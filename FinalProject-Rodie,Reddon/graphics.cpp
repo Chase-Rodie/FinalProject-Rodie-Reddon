@@ -1,5 +1,5 @@
 #include "graphics.h"
-#include <glm/gtx/string_cast.hpp> // for glm::to_string
+#include <glm/gtx/string_cast.hpp> 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -166,17 +166,9 @@ void main()
 	// Create a single asteroid mesh
 	m_asteroid = new Mesh(glm::vec3(0.0f), "assets\\asteroid.obj", "assets\\asteroid.jpg");
 	GenerateAsteroidBelts();
-	SetupAsteroidInstancing(); // <-- Call this here
+	SetupAsteroidInstancing();
 
-	// The Earth
-	//m_sphere2 = new Sphere(48, "assets\\2k_earth_daymap.jpg");
-
-	// Repeat for outer VBO if desired � OR reuse the same VAO if using same mesh
-
-
-	// The moon
-	//m_sphere3 = new Sphere(48, "assets\\2k_moon.jpg");
-
+	
 	planets = {
 		{ "Mercury", 2.0f, 4.74f, 10.83f, 0.2f, 0.01f, "assets/Mercury.jpg", glm::vec3(10.0f, 5.0f, 0.0f), glm::vec3(0.01f) },
 		{ "Venus",   3.0f, 3.5f, -6.52f, 0.45f, 177.4f, "assets/Venus.jpg", glm::vec3(10.0f, 5.0f, 0.0f), glm::vec3(0.01f) },
@@ -294,76 +286,11 @@ currentCometPosition = glm::vec3(x, 0.0f, z);
 
 glm::mat4 cometModel = glm::translate(glm::mat4(1.0f), cometPos) *
 cometOrientation *
-glm::scale(glm::vec3(1.0f)); // <- Up from 0.15 to 1.0
+glm::scale(glm::vec3(1.0f)); 
 halleysComet.body->Update(cometModel);
 
 
-
-
-
-
-	//// 2. Planet: orbit sun in x-z plane
-	//modelStack.push(modelStack.top());
-	//glm::mat4 planetOrbit = glm::rotate(identity, (float)(dt), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
-	//glm::mat4 planetTranslate = glm::translate(glm::vec3(5.0f, 0.0f, 0.0f)); // orbit radius
-	//glm::mat4 planetRotate = glm::rotate(identity, (float)(dt * 2.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // self-rotation
-	//glm::mat4 planetScale = glm::scale(glm::vec3(0.6f));
-	//glm::mat4 planetModel = modelStack.top() * planetOrbit * planetTranslate * planetRotate * planetScale;
-	//m_sphere2->Update(planetModel);
-
-	// 3. Moon: orbit planet at a tilted angle
-	//modelStack.push(planetSpheres[2]->GetModel()); 
-	//glm::mat4 moonTilt = glm::rotate(identity, glm::radians(30.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // tilt
-	//glm::mat4 moonOrbit = glm::rotate(identity, (float)(dt * 3.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // orbiting
-	//glm::mat4 moonTranslate = glm::translate(glm::vec3(1.5f, 0.0f, 0.0f));
-	//glm::mat4 moonScale = glm::scale(glm::vec3(0.2f));
-	//glm::mat4 moonModel = modelStack.top() * moonTilt * moonOrbit * moonTranslate * moonScale;
-	//m_sphere3->Update(moonModel);
-	//modelStack.pop(); // pop moon
-
 	modelStack.pop(); // pop planet
-
-	// 4. Starship: orbit in Y-Z plane and point toward sun (independent of model stack)
-	//float starshipAngle = static_cast<float>(totalTime * 0.8f);
-	//float orbitRadius = 14.0f;
-
-	//// Position relative to world origin (not from modelStack)
-	//glm::vec3 shipPos = glm::vec3(0.0f, 0.0f, -20.0f); // just place it somewhere in space
-	//glm::vec3 sunPos = glm::vec3(0.0f);
-
-	////// Calculate orientation to face the Sun
-	//glm::vec3 shipForward = glm::vec3(0.0f, 0.0f, 1.0f); // optional: define forward
-	//glm::vec3 shipRight = glm::vec3(1.0f, 0.0f, 0.0f);
-	//glm::vec3 shipUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	//glm::mat4 shipOrientation = glm::mat4(1.0f);
-	//shipOrientation[0] = glm::vec4(shipRight, 0.0f);
-	//shipOrientation[1] = glm::vec4(shipUp, 0.0f);
-	//shipOrientation[2] = glm::vec4(-shipForward, 0.0f); // Note: negative forward to match camera look
-	//shipOrientation[3] = glm::vec4(0, 0, 0, 1);
-
-	////// Final model matrix for starship
-	//glm::mat4 shipModel = glm::translate(glm::mat4(1.0f), shipPos)
-	//	* shipOrientation
-	//	* glm::scale(glm::vec3(0.3f));
-
-	//m_mesh->Update(shipModel);
-
-
-
-	// Place the camera behind and above the ship
-	//glm::mat4 shipModel = m_mesh->GetModel();
-	//glm::vec3 finalShipPos = glm::vec3(shipModel[3]);
-	//glm::vec3 finalForward = -glm::normalize(glm::vec3(shipModel[2]));
-	//glm::vec3 finalUp = glm::normalize(glm::vec3(shipModel[1]));
-
-
-	//glm::vec3 cameraOffset = finalForward * 10.0f + finalUp * 10.0f;
-	//glm::vec3 cameraPos = finalShipPos + cameraOffset;
-	//m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
-
-
-	//m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
 
 	previousCometPosition = currentCometPosition;
 
@@ -373,9 +300,6 @@ halleysComet.body->Update(cometModel);
 	// Keep only the most recent N positions
 	if (cometTrailPositions.size() > maxTrailLength)
 		cometTrailPositions.pop_back();
-
-
-
 
 }
 
@@ -397,16 +321,14 @@ void Graphics::Render()
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	m_shader->Enable();  // Shader must be active before setting uniforms
+	m_shader->Enable();  
 
-	// 💡 LIGHT UNIFORMS – put this block here
 	glm::vec3 lightDir = glm::normalize(glm::vec3(1.0, -1.0, -1.0));
 	glm::vec3 nightDir = -lightDir;
 
 
-
-	glm::vec3 ambientColor = glm::vec3(0.3f);  // Bright enough for visibility
-	glm::vec3 overrideColor = glm::vec3(0.0f); // Use base color or texture
+	glm::vec3 ambientColor = glm::vec3(0.3f);  
+	glm::vec3 overrideColor = glm::vec3(0.0f); 
 
 	if (m_lightDir != -1) glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
 	if (m_ambientColor != -1) glUniform3fv(m_ambientColor, 1, glm::value_ptr(ambientColor));
@@ -440,10 +362,9 @@ void Graphics::Render()
 	glDepthFunc(GL_LESS);  // reset depth
 
 
-	// Start the correct program
+	
 	m_shader->Enable();
 
-	// Send in the projection and view to the shader (stay the same while camera intrinsic(perspective) and extrinsic (view) parameters are the same
 	glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
 	glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
@@ -454,7 +375,7 @@ void Graphics::Render()
 
 		if (m_mesh->hasTex) {
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, m_mesh->getTextureID());  // FIXED: use m_mesh not m_sphere
+			glBindTexture(GL_TEXTURE_2D, m_mesh->getTextureID()); 
 
 			GLuint sampler = m_shader->GetUniformLocation("sp");
 			if (sampler == INVALID_UNIFORM_LOCATION) {
@@ -466,7 +387,7 @@ void Graphics::Render()
 		m_mesh->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
-	// Debug: Draw first 50 asteroids individually
+	
 	int count = std::min(100, static_cast<int>(innerAsteroidTransforms.size()));
 	for (int i = 0; i < count; ++i) {
 		m_asteroid->Update(innerAsteroidTransforms[i]);
@@ -562,7 +483,7 @@ void Graphics::Render()
 			nightColor = glm::vec3(0.05f);                 // soft ambient
 		}
 		else if (name == "Mars" || name == "Jupiter" || name == "Saturn") {
-			lightColor = glm::vec3(0.6f, 0.6f, 0.5f);       // soft greenish tone
+			lightColor = glm::vec3(0.6f, 0.6f, 0.5f);       
 			nightColor = glm::vec3(0.02f, 0.05f, 0.08f);
 		}
 		else if (name == "Uranus" || name == "Neptune") {
@@ -609,19 +530,15 @@ void Graphics::Render()
 		GLuint sampler = m_shader->GetUniformLocation("sp");
 		glUniform1i(sampler, 0);
 	}
-	//halleysComet.body->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
-
+	
 	RenderCometTail(currentCometPosition, glm::vec3(0.0f)); 
 
-
-
-
-	// Get any errors from OpenGL
+	
 	auto error = glGetError();
 	if (error != GL_NO_ERROR)
 	{
 		string val = ErrorString(error);
-		//std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
+		
 	}
 }
 
@@ -670,10 +587,6 @@ bool Graphics::collectShPrLocs() {
 		anyProblem = false;
 	}
 
-	// Locate the position 
-	// 
-	// 
-	// attribute
 	m_positionAttrib = m_shader->GetAttribLocation("v_position");
 	if (m_positionAttrib == -1)
 	{
@@ -698,13 +611,6 @@ bool Graphics::collectShPrLocs() {
 		printf("hasTexture uniform not found\n");
 		anyProblem = false;
 	}
-
-	//overrideColorLoc = m_shader->GetUniformLocation("overrideColor");
-	//if (overrideColorLoc == INVALID_UNIFORM_LOCATION) {
-	//	printf("overrideColor uniform not found\n");
-	//	anyProblem = false;
-	//}
-
 
 	return anyProblem;
 }
@@ -749,7 +655,7 @@ void Graphics::RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPo
 {
 	if (cometTrailPositions.size() < 2) return;
 
-	glDisable(GL_DEPTH_TEST); // draw over things if needed
+	glDisable(GL_DEPTH_TEST); 
 
 	glLineWidth(6.0f);  
 
@@ -822,7 +728,7 @@ GLuint Graphics::loadCubemap(std::vector<std::string> faces) {
 			std::cout << "Loaded cubemap face: " << faces[i] << std::endl;
 		}
 		else {
-			std::cerr << "❌ Failed to load cubemap texture at: " << faces[i] << std::endl;
+			std::cerr << " Failed to load cubemap texture at: " << faces[i] << std::endl;
 
 			// Fallback: make an empty black texture instead of passing null
 			unsigned char black[] = { 0, 0, 0 };
@@ -900,4 +806,31 @@ void Graphics::SetupAsteroidInstancing() {
 
 	// Unbind VAO to avoid accidental overwrites
 	glBindVertexArray(0);
+}
+
+
+glm::vec3 Graphics::GetPlanetPosition(const std::string& name) {
+	for (size_t i = 0; i < planets.size(); ++i) {
+		if (planets[i].name == name) {
+			return glm::vec3(planetSpheres[i]->GetModel()[3]);
+		}
+	}
+	return glm::vec3(0.0f); // fallback
+}
+
+std::string Graphics::GetClosestPlanetName(const glm::vec3& position) {
+	float minDist = std::numeric_limits<float>::max();
+	std::string closestPlanet;
+
+	for (size_t i = 0; i < planetSpheres.size(); ++i) {
+		glm::vec3 planetPos = glm::vec3(planetSpheres[i]->GetModel()[3]);
+		float dist = glm::distance(position, planetPos);
+
+		if (dist < minDist) {
+			minDist = dist;
+			closestPlanet = planets[i].name;
+		}
+	}
+
+	return closestPlanet;
 }

@@ -6,12 +6,7 @@
 #include "window.h"
 #include "graphics.h"
 #include "gamemode.h"
-//static void cursorPositionCallBack(GLFWwindow*, double xpos, double ypos);
 
-//enum class GameMode {
-//    Exploration,
-//    Observation
-//};
 
 
 class Engine
@@ -35,6 +30,11 @@ public:
     bool tabPressedLastFrame = false;
 
     GameMode currentMode = GameMode::Exploration;
+    float orbitYaw = 90.0f;    // horizontal angle
+    float orbitPitch = 0.0f;   // vertical angle
+    float orbitDistance = 5.0f; // fixed zoom distance
+    glm::vec3 orbitTarget = glm::vec3(0.0f); // planet center
+    int observedPlanetIndex = -1;
 
 
 

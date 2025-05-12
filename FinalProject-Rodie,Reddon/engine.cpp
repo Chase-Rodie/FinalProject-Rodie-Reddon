@@ -45,9 +45,6 @@ bool Engine::Initialize()
             engine->getCamera()->ProcessMouseScroll(yoffset);
         });
 
-
-
-    // No errors
     return true;
 }
 
@@ -137,15 +134,30 @@ void Engine::ProcessInput()
                 cachedCamFront = cam->cameraFront;
                 cachedCamUp = cam->cameraUp;
 
+                // Find closest planet to ship
                 glm::mat4 shipModel = m_graphics->GetStarshipModelMatrix();
                 glm::vec3 shipPos = glm::vec3(shipModel[3]);
-                glm::vec3 shipForward = glm::normalize(glm::vec3(shipModel[2]));
 
-                glm::vec3 cameraPos = shipPos + shipForward * 2.5f; // move 0.5 units in front of ship
-                glm::vec3 planetPos = glm::vec3(5.0f, 0.0f, 0.0f);
+                // Find and store index of closest planet
+                float minDist = std::numeric_limits<float>::max();
+                for (int i = 0; i < planetSpheres.size(); ++i) {
+                    glm::vec3 planetPos = glm::vec3(planetSpheres[i]->GetModel()[3]);
+                    float dist = glm::distance(shipPos, planetPos);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        observedPlanetIndex = i;
+                    }
+                }
+
+                orbitDistance = 5.0f; // or scale based on planet
+
+                // Place camera in front of ship, looking at closest planet
+                glm::vec3 forward = glm::normalize(glm::vec3(shipModel[2]));
+                glm::vec3 cameraPos = shipPos + forward * 2.5f;
 
                 cam->SetPosition(cameraPos);
-                cam->FaceDirection(planetPos);
+                cam->FaceDirection(orbitTarget);
+
 
 
 
@@ -176,29 +188,17 @@ void Engine::ProcessInput()
 }
 
 
-//void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
-//{
 
-  //  glfwGetCursorPos(window, &xpos, &ypos);
-    //std::cout << "Position: (" << xpos << ":" << ypos << ")";
-//}
 
 unsigned int Engine::getDT()
 {
-    //long long TimeNowMillis = GetCurrentTimeMillis();
-    //assert(TimeNowMillis >= m_currentTimeMillis);
-    //unsigned int DeltaTimeMillis = (unsigned int)(TimeNowMillis - m_currentTimeMillis);
-    //m_currentTimeMillis = TimeNowMillis;
-    //return DeltaTimeMillis;
+    
     return glfwGetTime();
 }
 
 long long Engine::GetCurrentTimeMillis()
 {
-    //timeval t;
-    //gettimeofday(&t, NULL);
-    //long long ret = t.tv_sec * 1000 + t.tv_usec / 1000;
-    //return ret;
+    
     return (long long)glfwGetTime();
 }
 
@@ -223,6 +223,23 @@ void Engine::Display(GLFWwindow* window, double time) {
         cam->SetPosition(camWorldPos);
         cam->SetTarget(shipPos);
         cam->SetUp(up);
+
+    }
+    else {
+        if (observedPlanetIndex >= 0 && observedPlanetIndex < planetSpheres.size()) {
+            orbitTarget = glm::vec3(planetSpheres[observedPlanetIndex]->GetModel()[3]);
+        }
+
+        float yawRad = glm::radians(orbitYaw);
+        float pitchRad = glm::radians(orbitPitch);
+
+        glm::vec3 offset;
+        offset.x = orbitDistance * cos(pitchRad) * cos(yawRad);
+        offset.y = orbitDistance * sin(pitchRad);
+        offset.z = orbitDistance * cos(pitchRad) * sin(yawRad);
+        Camera* cam = m_graphics->getCamera();
+        glm::vec3 camPos = orbitTarget + offset;
+        cam->SetLookAt(camPos, orbitTarget, glm::vec3(0, 1, 0));
     }
 }
 
@@ -245,8 +262,14 @@ void Engine::cursor_position_callback(GLFWwindow* window, double xpos, double yp
     engine->lastX = xpos;
     engine->lastY = ypos;
     if (engine->currentMode == GameMode::Observation) {
-        cam->ProcessMouseMovement(xoffset, yoffset);  // Always rotate with mouse in this mode
+        engine->orbitYaw += xoffset * 0.2f;
+        engine->orbitPitch -= yoffset * 0.2f;
+
+        // Clamp pitch to avoid flipping
+        if (engine->orbitPitch > 89.0f) engine->orbitPitch = 89.0f;
+        if (engine->orbitPitch < -89.0f) engine->orbitPitch = -89.0f;
     }
+
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         cam->ProcessMouseMovement(xoffset, yoffset);  // Only rotate while dragging
     }

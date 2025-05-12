@@ -81,7 +81,8 @@ public:
     Mesh* getMesh() { return m_mesh; }
     void RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPos);
     void SetGameMode(GameMode mode) { currentMode = mode; }
-
+    glm::vec3 GetPlanetPosition(const std::string& name);
+    std::string GetClosestPlanetName(const glm::vec3& position);
 
 private:
     std::string ErrorString(GLenum error);

@@ -90,12 +90,11 @@ void main()
     // Light facing factor
     float NdotL = max(dot(norm, -lightDir), 0.0);
 
-    // Estimate distance-based attenuation
     float distance = length(fragPos); // distance from origin (Sun)
-    float attenuation = 1.0 / (distance * distance); // inverse square falloff
+    float attenuation = 1.0 / (distance * distance); 
 
-    // Clamp to avoid too bright or too dim results
-    attenuation = clamp(attenuation * 20.0, 0.0, 1.0); // scale factor is tweakable
+    
+    attenuation = clamp(attenuation * 20.0, 0.0, 1.0); 
 
     vec3 blendedLight = mix(nightColor, lightColor, NdotL);
     vec3 lighting = ambientColor + blendedLight * attenuation;
