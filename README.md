@@ -40,6 +40,10 @@ This project utilizes the following libraries:
   [https://www.glfw.org/](https://www.glfw.org/)
 - **GLM**: Mathematics library for graphics software  
   [https://github.com/g-truc/glm](https://github.com/g-truc/glm)
+- **SOIL2**: Uploading textures into OpenGL
+  [https://github.com/SpartanJ/SOIL2](https://github.com/SpartanJ/SOIL2)
+- **GLEW**: Extension loading library
+  [https://glew.sourceforge.net/](https://glew.sourceforge.net/)
 
 ## 🗂️ Project Structure
 
