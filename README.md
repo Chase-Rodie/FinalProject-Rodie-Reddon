@@ -38,8 +38,6 @@ This project utilizes the following libraries:
 ### ✅ Libraries Used in Class Assignments:
 - **GLFW**: Window management and input handling  
   [https://www.glfw.org/](https://www.glfw.org/)
-- **GLAD**: OpenGL function loader  
-  [https://glad.dav1d.de/](https://glad.dav1d.de/)
 - **GLM**: Mathematics library for graphics software  
   [https://github.com/g-truc/glm](https://github.com/g-truc/glm)
 
