@@ -1,18 +1,22 @@
-﻿  graphics.cpp
+﻿  engine.cpp
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'engine.cpp')
+  
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(180,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(229,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\engine.cpp(230,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  graphics.cpp
 C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
   (compiling source file 'graphics.cpp')
   
 C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(264,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(529,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\graphics.cpp(544,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   main.cpp
 C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
   (compiling source file 'main.cpp')
   
-  mesh.cpp
-C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-  (compiling source file 'mesh.cpp')
-  
-C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.cpp(112,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.cpp(156,20): warning C4018: '<': signed/unsigned mismatch
+  shader.cpp
   Generating Code...
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
