@@ -191,6 +191,7 @@ long long Engine::GetCurrentTimeMillis()
 
 void Engine::Display(GLFWwindow* window, double time) {
 
+    m_graphics->SetGameMode(currentMode);
     m_graphics->Render();
     m_window->Swap();
     m_graphics->HierarchicalUpdate2(deltaTime);

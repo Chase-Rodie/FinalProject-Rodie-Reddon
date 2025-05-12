@@ -5,13 +5,13 @@
 #include <assert.h>
 #include "window.h"
 #include "graphics.h"
-
+#include "gamemode.h"
 //static void cursorPositionCallBack(GLFWwindow*, double xpos, double ypos);
 
-enum class GameMode {
-    Exploration,
-    Observation
-};
+//enum class GameMode {
+//    Exploration,
+//    Observation
+//};
 
 
 class Engine

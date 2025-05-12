@@ -12,6 +12,8 @@ using namespace std;
 #include "object.h"
 #include "sphere.h"
 #include "mesh.h"
+#include "gamemode.h"
+
 
 #define numVBOs 2;
 #define numIBs 2;
@@ -66,14 +68,21 @@ public:
     glm::mat4 GetStarshipModelMatrix() const;
     void SetupAsteroidInstancing();
   
+    GLint m_lightColor;
+    GLint m_lightDir;
+    GLint m_ambientColor;
+    GLint m_overrideColor;
+
 
     Camera* getCamera() { return m_camera; }
     Mesh* getMesh() { return m_mesh; }
     void RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPos);
+    void SetGameMode(GameMode mode) { currentMode = mode; }
 
 
 private:
     std::string ErrorString(GLenum error);
+    GameMode currentMode;
 
     bool collectShPrLocs();
     void ComputeTransforms(double dt, std::vector<float> speed, std::vector<float> dist,

@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="gamemode.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="graphics_headers.h" />
     <ClInclude Include="mesh.h" />

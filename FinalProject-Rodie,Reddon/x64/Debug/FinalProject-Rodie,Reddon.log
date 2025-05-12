@@ -1,6 +1,8 @@
-﻿  graphics.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(254,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(413,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(413,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(748,17): warning C4566: character represented by universal-character-name '\u274C' cannot be represented in the current code page (1252)
-  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe
+﻿  mesh.cpp
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'mesh.cpp')
+  
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.cpp(100,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.cpp(139,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\FinalProject-Rodie,Reddon\mesh.cpp(183,20): warning C4018: '<': signed/unsigned mismatch
+  FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Lexie\source\repos\FinalProject-Rodie-Reddon\x64\Debug\FinalProject-Rodie,Reddon.exe

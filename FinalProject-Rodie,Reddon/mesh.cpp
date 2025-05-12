@@ -76,21 +76,22 @@ glm::mat4 Mesh::GetModel()
 	return model;
 }
 
-void Mesh::Render(GLint posAttribLoc, GLint colAttribLoc)
+void Mesh::Render(GLint posAttribLoc, GLint normAttribLoc)
+
 {
 
 	glBindVertexArray(vao);
 
 	// Enable vertex attibute arrays for each vertex attrib
 	glEnableVertexAttribArray(posAttribLoc);
-	glEnableVertexAttribArray(colAttribLoc);
+	glEnableVertexAttribArray(normAttribLoc);
 
 	// Bind your VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VB);
 
 	// Set vertex attribute pointers to the load correct data
 	glVertexAttribPointer(posAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glVertexAttribPointer(colAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(normAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 
 	// Bind your Element Array
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
@@ -100,15 +101,15 @@ void Mesh::Render(GLint posAttribLoc, GLint colAttribLoc)
 
 	// Disable vertex arrays
 	glDisableVertexAttribArray(posAttribLoc);
-	glDisableVertexAttribArray(colAttribLoc);
+	glDisableVertexAttribArray(normAttribLoc);
 }
 
-void Mesh::Render(GLint posAttribLoc, GLint colAttribLoc, GLint tcAttribLoc, GLint hasTextureLoc)
+void Mesh::Render(GLint posAttribLoc, GLint normAttribLoc, GLint tcAttribLoc, GLint hasTextureLoc)
 {
 	glBindVertexArray(vao);
 	// Enable vertex attibute arrays for each vertex attrib
 	glEnableVertexAttribArray(posAttribLoc);
-	glEnableVertexAttribArray(colAttribLoc);
+	glEnableVertexAttribArray(normAttribLoc);
 	glEnableVertexAttribArray(tcAttribLoc);
 
 	// Bind your VBO
@@ -116,7 +117,7 @@ void Mesh::Render(GLint posAttribLoc, GLint colAttribLoc, GLint tcAttribLoc, GLi
 
 	// Set vertex attribute pointers to the load correct data
 	glVertexAttribPointer(posAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, vertex));
-	glVertexAttribPointer(colAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+	glVertexAttribPointer(normAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
 	glVertexAttribPointer(tcAttribLoc, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
 
 	// If has texture, set up texture unit(s) Update here to activate and assign texture unit
@@ -139,7 +140,7 @@ void Mesh::Render(GLint posAttribLoc, GLint colAttribLoc, GLint tcAttribLoc, GLi
 
 	// Disable vertex arrays
 	glDisableVertexAttribArray(posAttribLoc);
-	glDisableVertexAttribArray(colAttribLoc);
+	glDisableVertexAttribArray(normAttribLoc);
 	glDisableVertexAttribArray(tcAttribLoc);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -165,19 +166,27 @@ bool Mesh::InitBuffers() {
 
 bool Mesh::loadModelFromFile(const char* path) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
+
+	// Add aiProcess_GenNormals to ensure normals are generated if missing
+	const aiScene* scene = importer.ReadFile(path,
+		aiProcess_Triangulate |
+		aiProcess_GenNormals |
+		aiProcess_JoinIdenticalVertices);
 
 	if (!scene) {
-		printf("couldn't open the .obj file. \n");
+		printf("couldn't open the .obj file.\n");
 		return false;
 	}
-
-	const int ivertTotalSize = 2 * sizeof(aiVector3D);
 
 	int iTotalVerts = 0;
 
 	for (int i = 0; i < scene->mNumMeshes; i++) {
 		aiMesh* mesh = scene->mMeshes[i];
+
+		if (!mesh->HasNormals()) {
+			std::cout << "Warning: Mesh " << i << " has no normals!" << std::endl;
+		}
+
 		int iMeshFaces = mesh->mNumFaces;
 		for (int j = 0; j < iMeshFaces; j++) {
 			const aiFace& face = mesh->mFaces[j];
@@ -190,14 +199,23 @@ bool Mesh::loadModelFromFile(const char* path) {
 
 				glm::vec3 position(pos.x, pos.y, pos.z);
 				glm::vec3 normal(norm.x, norm.y, norm.z);
-				glm::vec2 texCoord(tex.x, tex.y);  // Discard tex.z (we only need 2D UVs)
+				glm::vec2 texCoord(tex.x, tex.y);  // Discard tex.z
 
 				Vertices.push_back(Vertex(position, normal, texCoord));
+
+				
+				if (iTotalVerts + Vertices.size() < 5) {
+					std::cout << "Vertex " << index
+						<< " | Pos: (" << pos.x << ", " << pos.y << ", " << pos.z << ")"
+						<< " | Normal: (" << norm.x << ", " << norm.y << ", " << norm.z << ")"
+						<< std::endl;
+				}
 			}
 		}
 
 		iTotalVerts += mesh->mNumVertices;
 	}
+
 	for (int i = 0; i < Vertices.size(); i++) {
 		Indices.push_back(i);
 	}

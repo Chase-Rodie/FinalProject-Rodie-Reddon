@@ -10,8 +10,6 @@ std::vector<Moon> moons;
 Comet halleysComet;
 
 
-
-
 Graphics::Graphics()
 {
 
@@ -24,6 +22,8 @@ Graphics::~Graphics()
 
 bool Graphics::Initialize(int width, int height)
 {
+	currentMode = GameMode::Exploration; // Default mode
+
 	// Used for the linux OS
 #if !defined(__APPLE__) && !defined(MACOSX)
   // cout << glewGetString(GLEW_VERSION) << endl;
@@ -270,13 +270,6 @@ void Graphics::HierarchicalUpdate2(double dt) {
 	glm::vec3 cometPos = glm::vec3(x, 0.0f, z);
 
 
-
-	//std::cout << "[Comet] Position: ("
-		//<< cometPos.x << ", "
-		//<< cometPos.y << ", "
-		//<< cometPos.z << ")" << std::endl;
-
-
 	// Comet faces away from the Sun
 	glm::vec3 sunToComet = glm::normalize(cometPos - glm::vec3(0.0f));
 	glm::vec3 cometForward = -sunToComet;  // tail points away
@@ -370,7 +363,6 @@ halleysComet.body->Update(cometModel);
 
 
 	//m_camera->SetLookAt(cameraPos, finalShipPos, finalUp);
-	std::cout << "[Comet] x: " << x << " z: " << z << " totalTime: " << totalTime << "\n";
 
 	previousCometPosition = currentCometPosition;
 
@@ -400,9 +392,23 @@ void Graphics::ComputeTransforms(double dt, std::vector<float> speed, std::vecto
 
 void Graphics::Render()
 {
-	//clear the screen
-	glClearColor(0.5, 0.2, 0.2, 1.0);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	m_shader->Enable();  // Shader must be active before setting uniforms
+
+	// 💡 LIGHT UNIFORMS – put this block here
+	glm::vec3 lightColor = glm::vec3(1.0f);
+	glm::vec3 lightDir = glm::normalize(glm::vec3(0.0, -0.5, -1.0));  // angled front+down
+
+	glm::vec3 ambientColor = glm::vec3(0.5f);  // Bright enough for visibility
+	glm::vec3 overrideColor = glm::vec3(0.0f); // Use base color or texture
+
+	if (m_lightColor != -1) glUniform3fv(m_lightColor, 1, glm::value_ptr(lightColor));
+	if (m_lightDir != -1) glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
+	if (m_ambientColor != -1) glUniform3fv(m_ambientColor, 1, glm::value_ptr(ambientColor));
+	if (m_overrideColor != -1) glUniform3fv(m_overrideColor, 1, glm::value_ptr(overrideColor));
 
 	// --- SKYBOX ---
 	glDepthFunc(GL_LEQUAL);
@@ -504,11 +510,11 @@ void Graphics::Render()
 	//	// Reset instanced flag
 	//	glUniform1i(isInstancedLoc, false);
 	//}
+	std::cout << "lightDir = " << glm::to_string(lightDir) << std::endl;
 
 	
 	if (!innerAsteroidTransforms.empty()) {
-		GLint isInstancedLoc = m_shader->GetUniformLocation("isInstanced");
-		glUniform1i(isInstancedLoc, true);
+		
 		glUniform1i(m_hasTexture, true);
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
 
@@ -522,7 +528,6 @@ void Graphics::Render()
 
 		glDrawElementsInstanced(GL_TRIANGLES, m_asteroid->GetIndexCount(), GL_UNSIGNED_INT, 0, innerAsteroidTransforms.size());
 
-		glUniform1i(isInstancedLoc, false);  // reset
 	}
 
 	
@@ -547,7 +552,7 @@ void Graphics::Render()
 
 	/*if (m_pyramid != NULL) {
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_pyramid->GetModel()));
-		m_pyramid->Render(m_positionAttrib, m_colorAttrib);
+		m_pyramid->Render(m_positionA ttrib, m_colorAttrib);
 	}*/
 
 	if (m_sphere != NULL) {
@@ -641,18 +646,33 @@ void Graphics::Render()
 	if (error != GL_NO_ERROR)
 	{
 		string val = ErrorString(error);
-		std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
+		//std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
 	}
 }
 
 
 bool Graphics::collectShPrLocs() {
+
+	m_lightColor = m_shader->GetUniformLocation("lightColor");
+	m_lightDir = m_shader->GetUniformLocation("lightDir");
+	m_ambientColor = m_shader->GetUniformLocation("ambientColor");
+	m_overrideColor = m_shader->GetUniformLocation("overrideColor");
+
+
+
 	bool anyProblem = true;
 	// Locate the projection matrix in the shader
 	m_projectionMatrix = m_shader->GetUniformLocation("projectionMatrix");
 	if (m_projectionMatrix == INVALID_UNIFORM_LOCATION)
 	{
 		printf("m_projectionMatrix not found\n");
+		anyProblem = false;
+	}
+
+	m_overrideColor = m_shader->GetUniformLocation("overrideColor");
+	if (m_overrideColor == INVALID_UNIFORM_LOCATION)
+	{
+		printf("overrideColor uniform not found\n");
 		anyProblem = false;
 	}
 
@@ -705,11 +725,11 @@ bool Graphics::collectShPrLocs() {
 		anyProblem = false;
 	}
 
-	overrideColorLoc = m_shader->GetUniformLocation("overrideColor");
-	if (overrideColorLoc == INVALID_UNIFORM_LOCATION) {
-		printf("overrideColor uniform not found\n");
-		anyProblem = false;
-	}
+	//overrideColorLoc = m_shader->GetUniformLocation("overrideColor");
+	//if (overrideColorLoc == INVALID_UNIFORM_LOCATION) {
+	//	printf("overrideColor uniform not found\n");
+	//	anyProblem = false;
+	//}
 
 
 	return anyProblem;
@@ -786,7 +806,8 @@ void Graphics::RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPo
 		glVertexAttribPointer(m_positionAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 		glUniform1i(m_hasTexture, false);
-		glUniform3f(overrideColorLoc, color.r, color.g, color.b); // faded color
+		glUniform3f(m_overrideColor, color.r, color.g, color.b);
+		// faded color
 
 		glDrawArrays(GL_LINES, 0, 2);
 
@@ -797,7 +818,8 @@ void Graphics::RenderCometTail(const glm::vec3& cometPos, const glm::vec3& sunPo
 		glDeleteVertexArrays(1, &tailVAO);
 	}
 
-	glUniform3f(overrideColorLoc, 0.0f, 0.0f, 0.0f); // reset
+	glUniform3f(m_overrideColor, 0.0f, 0.0f, 0.0f);
+	// reset
 	glEnable(GL_DEPTH_TEST);  // restore
 }
 
