@@ -1,16 +1,9 @@
-﻿  graphics.cpp
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
-  (compiling source file 'graphics.cpp')
-  
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(264,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(404,25): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(404,20): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
-C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(523,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+﻿  shader.cpp
 soil2-debug.lib(SOIL2.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:ICF' specification
 LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  5 of 1036 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
+  1 of 1031 functions (<0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    27 functions had inline decision re-evaluated but remain unchanged
+    3 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Release\FinalProject-Rodie,Reddon.exe

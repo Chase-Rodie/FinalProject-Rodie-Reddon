@@ -68,22 +68,32 @@ bool Shader::AddShader(GLenum ShaderType)
             uniform vec3 lightColor;
             uniform vec3 lightDir;
             uniform vec3 ambientColor;
+            uniform vec3 nightColor;    
+            uniform bool isEmissive; 
+            uniform vec3 nightDir;
 
             out vec4 frag_color;
 
             void main()
             {
-                vec3 norm = normalize(normal);
-                float diff = max(dot(norm, -lightDir), 0.0) * 3.0;
+                if (isEmissive) {
+                    vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
+                    frag_color = vec4(baseColor * 5.0, 1.0); // intense glow
+                    return;
+            }
 
-                vec3 lighting = ambientColor + diff * lightColor;
+            vec3 norm = normalize(normal);
+            float NdotL = max(dot(norm, -lightDir), 0.0);
 
-                vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
-                vec3 finalColor = (overrideColor != vec3(0.0)) ? overrideColor : baseColor;
-vec3 n = normalize(normal);
-frag_color = vec4(n * 0.5 + 0.5, 1.0); 
-      }
-        )";
+            // Smooth blend between day and night colors
+            vec3 lightMix = mix(nightColor, lightColor, NdotL);
+            vec3 lighting = ambientColor + lightMix;
+
+            vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
+            vec3 finalColor = (overrideColor != vec3(0.0)) ? overrideColor : baseColor;
+
+            frag_color = vec4(finalColor * lighting, 1.0);
+            })";
     }
 
     GLuint ShaderObj = glCreateShader(ShaderType);

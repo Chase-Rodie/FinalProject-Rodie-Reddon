@@ -112,6 +112,9 @@ private:
 
     double totalTime = 0.0; 
 
+    GLint m_nightColor;
+    GLint m_nightDir;
+
 
     GLint overrideColorLoc;
 

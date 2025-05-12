@@ -24,6 +24,8 @@ public:
 private:
     GLuint m_shaderProg;
     std::vector<GLuint> m_shaderObjList;
+
+
 };
 
 #endif  /* SHADER_H */

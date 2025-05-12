@@ -399,16 +399,31 @@ void Graphics::Render()
 	m_shader->Enable();  // Shader must be active before setting uniforms
 
 	// 💡 LIGHT UNIFORMS – put this block here
-	glm::vec3 lightColor = glm::vec3(1.0f);
-	glm::vec3 lightDir = glm::normalize(glm::vec3(0.0, -0.5, -1.0));  // angled front+down
+	glm::vec3 lightColor = glm::vec3(1.1f, 1.0f, 0.9f); // warm white/yellow
+	glm::vec3 nightColor = glm::vec3(0.1f, 0.2f, 0.4f); // cool blue
+	glm::vec3 lightDir = glm::normalize(glm::vec3(1.0, -1.0, -1.0));
+	glm::vec3 nightDir = -lightDir;
 
-	glm::vec3 ambientColor = glm::vec3(0.5f);  // Bright enough for visibility
+
+
+	glm::vec3 ambientColor = glm::vec3(0.3f);  // Bright enough for visibility
 	glm::vec3 overrideColor = glm::vec3(0.0f); // Use base color or texture
 
 	if (m_lightColor != -1) glUniform3fv(m_lightColor, 1, glm::value_ptr(lightColor));
 	if (m_lightDir != -1) glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
 	if (m_ambientColor != -1) glUniform3fv(m_ambientColor, 1, glm::value_ptr(ambientColor));
 	if (m_overrideColor != -1) glUniform3fv(m_overrideColor, 1, glm::value_ptr(overrideColor));
+
+	GLint locLightColor = m_shader->GetUniformLocation("lightColor");
+	GLint locNightColor = m_shader->GetUniformLocation("nightColor");
+	GLint locLightDir = m_shader->GetUniformLocation("lightDir");
+	GLint locNightDir = m_shader->GetUniformLocation("nightDir");
+
+	if (locLightColor != -1) glUniform3fv(locLightColor, 1, glm::value_ptr(lightColor));
+	if (locNightColor != -1) glUniform3fv(locNightColor, 1, glm::value_ptr(nightColor));
+	if (locLightDir != -1) glUniform3fv(locLightDir, 1, glm::value_ptr(lightDir));
+	if (locNightDir != -1) glUniform3fv(locNightDir, 1, glm::value_ptr(nightDir));
+
 
 	// --- SKYBOX ---
 	glDepthFunc(GL_LEQUAL);
@@ -556,19 +571,21 @@ void Graphics::Render()
 	}*/
 
 	if (m_sphere != NULL) {
+		GLint emissiveLoc = m_shader->GetUniformLocation("isEmissive");
+		glUniform1i(emissiveLoc, true); // make Sun emissive
+
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere->GetModel()));
 		if (m_sphere->hasTex) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, m_sphere->getTextureID());
 			GLuint sampler = m_shader->GetUniformLocation("sp");
-			if (sampler == INVALID_UNIFORM_LOCATION)
-			{
-				printf("Sampler Not found not found\n");
-			}
 			glUniform1i(sampler, 0);
-			m_sphere->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 		}
+		m_sphere->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
+
+		glUniform1i(emissiveLoc, false); // reset for other objects
 	}
+
 
 	//if (m_sphere2 != NULL) {
 	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere2->GetModel()));
@@ -602,19 +619,29 @@ void Graphics::Render()
 	//	}
 	//}
 
+	glm::vec3 sunPos = glm::vec3(0.0f); // Sun is at origin
+
 	for (Sphere* planet : planetSpheres) {
-		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(planet->GetModel()));
+		glm::mat4 model = planet->GetModel();
+		glm::vec3 objPos = glm::vec3(model[3]);  
+		glm::vec3 lightDir = glm::normalize(sunPos - objPos);
+
+		if (m_lightDir != -1) {
+			glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
+		}
+
+		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(model));
+
 		if (planet->hasTex) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, planet->getTextureID());
 			GLuint sampler = m_shader->GetUniformLocation("sp");
-			if (sampler == INVALID_UNIFORM_LOCATION) {
-				printf("Sampler Not found\n");
-			}
 			glUniform1i(sampler, 0);
 		}
+
 		planet->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
+
 
 	for (Moon& m : moons) {
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m.sphere->GetModel()));
@@ -657,6 +684,9 @@ bool Graphics::collectShPrLocs() {
 	m_lightDir = m_shader->GetUniformLocation("lightDir");
 	m_ambientColor = m_shader->GetUniformLocation("ambientColor");
 	m_overrideColor = m_shader->GetUniformLocation("overrideColor");
+	m_nightColor = m_shader->GetUniformLocation("nightColor");
+	m_nightDir = m_shader->GetUniformLocation("nightDir");
+
 
 
 
