@@ -76,33 +76,6 @@ glm::mat4 Mesh::GetModel()
 	return model;
 }
 
-void Mesh::Render(GLint posAttribLoc, GLint normAttribLoc)
-
-{
-
-	glBindVertexArray(vao);
-
-	// Enable vertex attibute arrays for each vertex attrib
-	glEnableVertexAttribArray(posAttribLoc);
-	glEnableVertexAttribArray(normAttribLoc);
-
-	// Bind your VBO
-	glBindBuffer(GL_ARRAY_BUFFER, VB);
-
-	// Set vertex attribute pointers to the load correct data
-	glVertexAttribPointer(posAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-	glVertexAttribPointer(normAttribLoc, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
-
-	// Bind your Element Array
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IB);
-
-	// Render
-	glDrawElements(GL_TRIANGLES, Indices.size(), GL_UNSIGNED_INT, 0);
-
-	// Disable vertex arrays
-	glDisableVertexAttribArray(posAttribLoc);
-	glDisableVertexAttribArray(normAttribLoc);
-}
 
 void Mesh::Render(GLint posAttribLoc, GLint normAttribLoc, GLint tcAttribLoc, GLint hasTextureLoc)
 {

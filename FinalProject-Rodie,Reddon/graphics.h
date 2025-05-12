@@ -105,7 +105,7 @@ private:
     GLint m_viewMatrix;
     GLint m_modelMatrix;
     GLint m_positionAttrib;
-    GLint m_colorAttrib;
+    GLint m_normalAttrib;
     GLint m_tcAttrib;
     GLint m_hasTexture;
     GLuint innerAsteroidVBO, outerAsteroidVBO;

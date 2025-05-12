@@ -458,7 +458,7 @@ void Graphics::Render()
 			glUniform1i(sampler, 0);
 		}
 
-		m_mesh->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+		m_mesh->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
 	// Debug: Draw first 50 asteroids individually (no instancing)
@@ -476,7 +476,7 @@ void Graphics::Render()
 			glUniform1i(sampler, 0);
 		}
 
-		m_asteroid->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+		m_asteroid->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
 
@@ -547,7 +547,7 @@ void Graphics::Render()
 			glUniform1i(sampler, 0);
 		}
 
-		m_asteroid->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+		m_asteroid->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
 	/*if (m_pyramid != NULL) {
@@ -566,7 +566,7 @@ void Graphics::Render()
 				printf("Sampler Not found not found\n");
 			}
 			glUniform1i(sampler, 0);
-			m_sphere->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+			m_sphere->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 		}
 	}
 
@@ -613,7 +613,7 @@ void Graphics::Render()
 			}
 			glUniform1i(sampler, 0);
 		}
-		planet->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+		planet->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
 	for (Moon& m : moons) {
@@ -624,7 +624,7 @@ void Graphics::Render()
 			GLuint sampler = m_shader->GetUniformLocation("sp");
 			glUniform1i(sampler, 0);
 		}
-		m.sphere->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
+		m.sphere->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
 	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(halleysComet.body->GetModel()));
@@ -704,8 +704,8 @@ bool Graphics::collectShPrLocs() {
 	}
 
 	// Locate the color vertex attribute
-	m_colorAttrib = m_shader->GetAttribLocation("v_color");
-	if (m_colorAttrib == -1)
+	m_normalAttrib = m_shader->GetAttribLocation("v_color");
+	if (m_normalAttrib == -1)
 	{
 		printf("v_color attribute not found\n");
 		anyProblem = false;
