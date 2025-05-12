@@ -57,43 +57,57 @@ bool Shader::AddShader(GLenum ShaderType)
     else if (ShaderType == GL_FRAGMENT_SHADER)
     {
         s = R"(
-            #version 460
-            in vec3 fragPos;
-            in vec3 normal;
-            in vec2 tc;
+#version 460
 
-            uniform sampler2D sp;
-            uniform bool hasTexture;
-            uniform vec3 overrideColor;
-            uniform vec3 lightColor;
-            uniform vec3 lightDir;
-            uniform vec3 ambientColor;
-            uniform vec3 nightColor;    
-            uniform bool isEmissive; 
-            uniform vec3 nightDir;
+in vec3 fragPos;
+in vec3 normal;
+in vec2 tc;
 
-            out vec4 frag_color;
+uniform sampler2D sp;
+uniform bool hasTexture;
+uniform vec3 overrideColor;
 
-            void main()
-            {
-                if (isEmissive) {
-                    vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
-                    frag_color = vec4(baseColor * 5.0, 1.0); // intense glow
-                    return;
-            }
+uniform vec3 lightColor;
+uniform vec3 lightDir;
 
-            vec3 norm = normalize(normal);
-            float NdotL = max(dot(norm, -lightDir), 0.0);
+uniform vec3 nightColor;
+uniform vec3 ambientColor;
 
-            // Smooth blend between day and night colors
-            vec3 lightMix = mix(nightColor, lightColor, NdotL);
-            vec3 lighting = ambientColor + lightMix;
+uniform bool isEmissive;
 
-            vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
-            vec3 finalColor = (overrideColor != vec3(0.0)) ? overrideColor : baseColor;
+out vec4 frag_color;
 
-            frag_color = vec4(finalColor * lighting, 1.0);
-            })";
+void main()
+{
+    if (isEmissive) {
+        vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
+        frag_color = vec4(baseColor * 5.0, 1.0); // Glowing Sun
+        return;
+    }
+
+    vec3 norm = normalize(normal);
+
+    // Light facing factor
+    float NdotL = max(dot(norm, -lightDir), 0.0);
+
+    // Estimate distance-based attenuation
+    float distance = length(fragPos); // distance from origin (Sun)
+    float attenuation = 1.0 / (distance * distance); // inverse square falloff
+
+    // Clamp to avoid too bright or too dim results
+    attenuation = clamp(attenuation * 20.0, 0.0, 1.0); // scale factor is tweakable
+
+    vec3 blendedLight = mix(nightColor, lightColor, NdotL);
+    vec3 lighting = ambientColor + blendedLight * attenuation;
+
+
+    // Texture or fallback color
+    vec3 baseColor = hasTexture ? texture(sp, tc).rgb : vec3(1.0);
+    vec3 finalColor = (overrideColor != vec3(0.0)) ? overrideColor : baseColor;
+
+    frag_color = vec4(finalColor * lighting, 1.0);
+}
+)";
     }
 
     GLuint ShaderObj = glCreateShader(ShaderType);

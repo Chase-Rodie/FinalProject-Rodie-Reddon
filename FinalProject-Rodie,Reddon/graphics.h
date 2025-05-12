@@ -36,7 +36,10 @@ struct CelestialBody {
     float scale;
     float axialTilt;
     std::string texturePath;
+    glm::vec3 lightColor = glm::vec3(1.0f); 
+    glm::vec3 nightColor = glm::vec3(0.1f);
 };
+
 
 extern std::vector<CelestialBody> planets;
 extern std::vector<Sphere*> planetSpheres;

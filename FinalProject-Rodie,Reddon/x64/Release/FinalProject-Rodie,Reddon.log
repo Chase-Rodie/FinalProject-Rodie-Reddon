@@ -1,9 +1,27 @@
-﻿  shader.cpp
+﻿  engine.cpp
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'engine.cpp')
+  
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(45,53): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(70,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(180,23): warning C4244: 'return': conversion from 'double' to 'unsigned int', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(229,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\engine.cpp(230,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  graphics.cpp
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'graphics.cpp')
+  
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(265,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\graphics.cpp(539,118): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  main.cpp
+C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\FinalProject-Rodie,Reddon\mesh.h(32,52): warning C4267: 'return': conversion from 'size_t' to 'int', possible loss of data
+  (compiling source file 'main.cpp')
+  
 soil2-debug.lib(SOIL2.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:ICF' specification
 LINK : warning LNK4098: defaultlib 'MSVCRTD' conflicts with use of other libs; use /NODEFAULTLIB:library
   Generating code
-  1 of 1031 functions (<0.1%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+  36 of 1029 functions ( 3.5%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    18 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   FinalProject-Rodie,Reddon.vcxproj -> C:\Users\Chase\source\repos\FinalProject-Rodie,Reddon\x64\Release\FinalProject-Rodie,Reddon.exe

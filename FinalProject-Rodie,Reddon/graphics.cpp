@@ -178,15 +178,16 @@ void main()
 	//m_sphere3 = new Sphere(48, "assets\\2k_moon.jpg");
 
 	planets = {
-		{ "Mercury", 2.0f, 4.74f, 10.83f, 0.2f, 0.01f, "assets/Mercury.jpg" },
-		{ "Venus",   3.0f, 3.5f, -6.52f, 0.45f, 177.4f, "assets/Venus.jpg" },
-		{ "Earth",   4.0f, 2.98f, 15.0f, 0.5f, 23.5f, "assets/2k_earth_daymap.jpg" },
-		{ "Mars",    5.0f, 2.41f, 14.6f, 0.35f, 25.0f, "assets/Mars.jpg" },
-		{ "Jupiter", 7.0f, 1.31f, 25.0f, 1.0f, 3.1f, "assets/Jupiter.jpg" },
-		{ "Saturn",  9.0f, 0.97f, 22.0f, 0.9f, 26.7f, "assets/Saturn.jpg" },
-		{ "Uranus",  11.0f, 0.68f, -17.2f, 0.7f, 97.8f, "assets/Uranus.jpg" },
-		{ "Neptune", 13.0f, 0.54f, 16.1f, 0.65f, 28.3f, "assets/Neptune.jpg" }
+		{ "Mercury", 2.0f, 4.74f, 10.83f, 0.2f, 0.01f, "assets/Mercury.jpg", glm::vec3(10.0f, 5.0f, 0.0f), glm::vec3(0.01f) },
+		{ "Venus",   3.0f, 3.5f, -6.52f, 0.45f, 177.4f, "assets/Venus.jpg", glm::vec3(10.0f, 5.0f, 0.0f), glm::vec3(0.01f) },
+		{ "Earth",   4.0f, 2.98f, 15.0f, 0.5f, 23.5f, "assets/2k_earth_daymap.jpg", glm::vec3(10.0f, 5.0f, 0.0f), glm::vec3(0.01f) },
+		{ "Mars",    5.0f, 2.41f, 14.6f, 0.35f, 25.0f, "assets/Mars.jpg", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 0.05f, 0.2f) },
+		{ "Jupiter", 7.0f, 1.31f, 25.0f, 1.0f, 3.1f, "assets/Jupiter.jpg", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 0.05f, 0.2f) },
+		{ "Saturn",  9.0f, 0.97f, 22.0f, 0.9f, 26.7f, "assets/Saturn.jpg", glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, 0.05f, 0.2f) },
+		{ "Uranus",  11.0f, 0.68f, -17.2f, 0.7f, 97.8f, "assets/Uranus.jpg", glm::vec3(0.0f, 1.0f, 10.0f), glm::vec3(0.3f, 0.3f, 1.0f) },
+		{ "Neptune", 13.0f, 0.54f, 16.1f, 0.65f, 28.3f, "assets/Neptune.jpg", glm::vec3(0.0f, 1.0f, 10.0f), glm::vec3(0.3f, 0.3f, 1.0f) }
 	};
+
 
 	for (const auto& p : planets) {
 		Sphere* s = new Sphere(48, p.texturePath.c_str());
@@ -399,28 +400,22 @@ void Graphics::Render()
 	m_shader->Enable();  // Shader must be active before setting uniforms
 
 	// 💡 LIGHT UNIFORMS – put this block here
-	glm::vec3 lightColor = glm::vec3(1.1f, 1.0f, 0.9f); // warm white/yellow
-	glm::vec3 nightColor = glm::vec3(0.1f, 0.2f, 0.4f); // cool blue
 	glm::vec3 lightDir = glm::normalize(glm::vec3(1.0, -1.0, -1.0));
 	glm::vec3 nightDir = -lightDir;
 
 
 
-	glm::vec3 ambientColor = glm::vec3(0.3f);  // Bright enough for visibility
+	glm::vec3 ambientColor = glm::vec3(0.2f);  // Bright enough for visibility
 	glm::vec3 overrideColor = glm::vec3(0.0f); // Use base color or texture
 
-	if (m_lightColor != -1) glUniform3fv(m_lightColor, 1, glm::value_ptr(lightColor));
 	if (m_lightDir != -1) glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
 	if (m_ambientColor != -1) glUniform3fv(m_ambientColor, 1, glm::value_ptr(ambientColor));
 	if (m_overrideColor != -1) glUniform3fv(m_overrideColor, 1, glm::value_ptr(overrideColor));
 
-	GLint locLightColor = m_shader->GetUniformLocation("lightColor");
 	GLint locNightColor = m_shader->GetUniformLocation("nightColor");
 	GLint locLightDir = m_shader->GetUniformLocation("lightDir");
 	GLint locNightDir = m_shader->GetUniformLocation("nightDir");
 
-	if (locLightColor != -1) glUniform3fv(locLightColor, 1, glm::value_ptr(lightColor));
-	if (locNightColor != -1) glUniform3fv(locNightColor, 1, glm::value_ptr(nightColor));
 	if (locLightDir != -1) glUniform3fv(locLightDir, 1, glm::value_ptr(lightDir));
 	if (locNightDir != -1) glUniform3fv(locNightDir, 1, glm::value_ptr(nightDir));
 
@@ -621,26 +616,47 @@ void Graphics::Render()
 
 	glm::vec3 sunPos = glm::vec3(0.0f); // Sun is at origin
 
-	for (Sphere* planet : planetSpheres) {
+	for (size_t i = 0; i < planetSpheres.size(); ++i) {
+		Sphere* planet = planetSpheres[i];
+		const std::string& name = planets[i].name;
 		glm::mat4 model = planet->GetModel();
-		glm::vec3 objPos = glm::vec3(model[3]);  
+		glm::vec3 objPos = glm::vec3(model[3]);
 		glm::vec3 lightDir = glm::normalize(sunPos - objPos);
+		glm::vec3 nightDir = -lightDir;
 
-		if (m_lightDir != -1) {
-			glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
+		glm::vec3 lightColor, nightColor;
+
+		if (name == "Mercury" || name == "Venus" || name == "Earth") {
+			lightColor = glm::vec3(10.0f, 5.0f, 0.0f);
+			nightColor = glm::vec3(0.01f, 0.01f, 0.01f);
+		}
+		else if (name == "Mars" || name == "Jupiter" || name == "Saturn") {
+			lightColor = glm::vec3(0.0f, 10.0f, 0.0f);
+			nightColor = glm::vec3(0.0f, 0.05f, 0.2f);
+		}
+		else if (name == "Uranus" || name == "Neptune") {
+			lightColor = glm::vec3(0.0f, 1.0f, 10.0f);
+			nightColor = glm::vec3(0.3f, 0.3f, 1.0f);
 		}
 
+		glUniform3fv(m_lightColor, 1, glm::value_ptr(lightColor));
+		glUniform3fv(m_nightColor, 1, glm::value_ptr(nightColor));
+		glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
+		glUniform3fv(m_nightDir, 1, glm::value_ptr(nightDir));
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(model));
 
 		if (planet->hasTex) {
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, planet->getTextureID());
-			GLuint sampler = m_shader->GetUniformLocation("sp");
-			glUniform1i(sampler, 0);
+			glUniform1i(m_shader->GetUniformLocation("sp"), 0);
 		}
 
 		planet->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
+
+
+
+
 
 
 	for (Moon& m : moons) {
