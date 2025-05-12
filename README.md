@@ -1,7 +1,6 @@
-from pathlib import Path
 
-# Create the README.md content
-readme_content = """# 🌌 Solar System Exploration Game
+# README.md content
+🌌 Solar System Exploration Game
 
 ## 🚀 Overview
 
