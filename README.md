@@ -44,6 +44,8 @@ This project utilizes the following libraries:
   [https://github.com/SpartanJ/SOIL2](https://github.com/SpartanJ/SOIL2)
 - **GLEW**: Extension loading library
   [https://glew.sourceforge.net/](https://glew.sourceforge.net/)
-
+- **ASSIMP**: Importing Models such as .obj files
+  [https://assimp.org/](https://assimp.org/)
+  
 ## 🗂️ Project Structure
 
