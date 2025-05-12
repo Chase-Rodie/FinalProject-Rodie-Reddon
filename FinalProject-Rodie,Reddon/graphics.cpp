@@ -405,7 +405,7 @@ void Graphics::Render()
 
 
 
-	glm::vec3 ambientColor = glm::vec3(0.2f);  // Bright enough for visibility
+	glm::vec3 ambientColor = glm::vec3(0.3f);  // Bright enough for visibility
 	glm::vec3 overrideColor = glm::vec3(0.0f); // Use base color or texture
 
 	if (m_lightDir != -1) glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));

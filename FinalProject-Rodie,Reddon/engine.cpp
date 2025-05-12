@@ -94,21 +94,34 @@ void Engine::ProcessInput()
     //exploration mode
     else if (currentMode == GameMode::Exploration) {
         Mesh* ship = m_graphics->getMesh();
-
         float shipSpeed = 65.0f * deltaTime;
-
         if (glfwGetKey(win, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             shipSpeed *= 3.0f;
 
+        // Movement
         if (glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
             ship->MoveForward(shipSpeed);
         if (glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
             ship->MoveForward(-shipSpeed);
-        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
-            ship->Rotate(0.0f, 60.0f * deltaTime, 0.0f); // turn left
-        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
-            ship->Rotate(0.0f, -60.0f * deltaTime, 0.0f); // turn right
 
+        // Rotation
+        if (glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
+            ship->Rotate(0.0f, 60.0f * deltaTime, 0.0f); // yaw left
+        if (glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
+            ship->Rotate(0.0f, -60.0f * deltaTime, 0.0f); // yaw right
+
+        if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS)
+            ship->Rotate(0.0f, 0.0f, 60.0f * deltaTime); // roll left
+        if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS)
+            ship->Rotate(0.0f, 0.0f, -60.0f * deltaTime); // roll right
+
+        if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS)
+            ship->Rotate(-60.0f * deltaTime, 0.0f, 0.0f); // pitch up
+        if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS)
+            ship->Rotate(60.0f * deltaTime, 0.0f, 0.0f); // pitch down
+
+        if (glfwGetKey(win, GLFW_KEY_SPACE) == GLFW_PRESS)
+            ship->Brake(); // brake to halt
     }
 
     bool tabPressed = glfwGetKey(win, GLFW_KEY_TAB) == GLFW_PRESS;

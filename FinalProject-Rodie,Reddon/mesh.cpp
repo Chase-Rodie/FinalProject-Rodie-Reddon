@@ -215,3 +215,13 @@ void Mesh::MoveForward(float amount) {
 	model = glm::translate(model, forward * amount);
 
 }
+
+
+void Mesh::Brake() {
+	// Reset velocity to 0 by preserving orientation but freezing position
+	glm::vec3 position = glm::vec3(model[3]); // keep current position
+	model[3] = glm::vec4(0, 0, 0, 1);
+	// Remove any translation while preserving orientation
+	model = glm::mat4(glm::mat3(model));
+	model[3] = glm::vec4(position, 1.0f);
+}

@@ -19,7 +19,7 @@ public:
     void Rotate(float 
         , float yaw, float roll);
     void MoveForward(float amount);
-
+    void Brake();
     glm::mat4 GetModel();
 
     bool InitBuffers();
