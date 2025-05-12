@@ -47,5 +47,4 @@ This project utilizes the following libraries:
 - **ASSIMP**: Importing Models such as .obj files
   [https://assimp.org/](https://assimp.org/)
   
-## 🗂️ Project Structure
 
