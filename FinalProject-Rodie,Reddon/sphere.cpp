@@ -115,6 +115,11 @@ void Sphere::setupVertices() {
         Vertices.push_back(Vertex(verts[idx], norms[idx], texs[idx]));
         Indices.push_back(i);
     }
+    std::cout << "First normal: "
+        << Vertices[0].normal.x << ", "
+        << Vertices[0].normal.y << ", "
+        << Vertices[0].normal.z << std::endl;
+
 }
 
 

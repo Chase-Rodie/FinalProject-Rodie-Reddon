@@ -447,12 +447,7 @@ void Graphics::Render()
 	glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
 	glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
-	// Render the objects
-	/*if (m_cube != NULL){
-		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
-		m_cube->Render(m_positionAttrib,m_colorAttrib);
-	}*/
-
+	
 	if (m_mesh != NULL) {
 		glUniform1i(m_hasTexture, false);
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_mesh->GetModel()));
@@ -471,7 +466,7 @@ void Graphics::Render()
 		m_mesh->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
-	// Debug: Draw first 50 asteroids individually (no instancing)
+	// Debug: Draw first 50 asteroids individually
 	int count = std::min(100, static_cast<int>(innerAsteroidTransforms.size()));
 	for (int i = 0; i < count; ++i) {
 		m_asteroid->Update(innerAsteroidTransforms[i]);
@@ -490,36 +485,7 @@ void Graphics::Render()
 	}
 
 
-	//if (!innerAsteroidTransforms.empty()) {
-	//	GLint isInstancedLoc = m_shader->GetUniformLocation("isInstanced");
-	//	glUniform1i(isInstancedLoc, true);
-	//	glUniform1i(m_hasTexture, true);
-	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(glm::mat4(1.0f)));
-
-	//	// Bind texture
-	//	glActiveTexture(GL_TEXTURE0);
-	//	glBindTexture(GL_TEXTURE_2D, m_asteroid->getTextureID());
-	//	GLuint sampler = m_shader->GetUniformLocation("sp");
-	//	glUniform1i(sampler, 0);
-
-	//	// Bind VAO and instance buffer
-	//	glBindVertexArray(m_asteroid->getVAO());
-	//	glBindBuffer(GL_ARRAY_BUFFER, innerAsteroidVBO);
-
-	//	// Set up per-instance matrix attributes (locations 3�6)
-	//	for (int i = 0; i < 4; ++i) {
-	//		glEnableVertexAttribArray(3 + i);
-	//		glVertexAttribPointer(3 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(float) * i * 4));
-	//		glVertexAttribDivisor(3 + i, 1);
-	//	}
-
-	//	// Draw
-	//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_asteroid->getIBO());
-	//	glDrawElementsInstanced(GL_TRIANGLES, m_asteroid->GetIndexCount(), GL_UNSIGNED_INT, 0, innerAsteroidTransforms.size());
-
-	//	// Reset instanced flag
-	//	glUniform1i(isInstancedLoc, false);
-	//}
+	
 	std::cout << "lightDir = " << glm::to_string(lightDir) << std::endl;
 
 	
@@ -560,11 +526,7 @@ void Graphics::Render()
 		m_asteroid->Render(m_positionAttrib, m_normalAttrib, m_tcAttrib, m_hasTexture);
 	}
 
-	/*if (m_pyramid != NULL) {
-		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_pyramid->GetModel()));
-		m_pyramid->Render(m_positionA ttrib, m_colorAttrib);
-	}*/
-
+	
 	if (m_sphere != NULL) {
 		GLint emissiveLoc = m_shader->GetUniformLocation("isEmissive");
 		glUniform1i(emissiveLoc, true); // make Sun emissive
@@ -582,37 +544,6 @@ void Graphics::Render()
 	}
 
 
-	//if (m_sphere2 != NULL) {
-	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere2->GetModel()));
-	//	if (m_sphere2->hasTex) {
-	//		glActiveTexture(GL_TEXTURE0);
-	//		glBindTexture(GL_TEXTURE_2D, m_sphere2->getTextureID());
-	//		GLuint sampler = m_shader->GetUniformLocation("sp");
-	//		if (sampler == INVALID_UNIFORM_LOCATION)
-	//		{
-	//			printf("Sampler Not found not found\n");
-	//		}
-	//		glUniform1i(sampler, 0);
-	//		m_sphere2->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
-	//	}
-	//}
-
-
-	// Render Moon
-	//if (m_sphere3 != NULL) {
-	//	glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_sphere3->GetModel()));
-	//	if (m_sphere3->hasTex) {
-	//		glActiveTexture(GL_TEXTURE0);
-	//		glBindTexture(GL_TEXTURE_2D, m_sphere3->getTextureID());
-	//		GLuint sampler = m_shader->GetUniformLocation("sp");
-	//		if (sampler == INVALID_UNIFORM_LOCATION)
-	//		{
-	//			printf("Sampler Not found not found\n");
-	//		}
-	//		glUniform1i(sampler, 0);
-	//		m_sphere3->Render(m_positionAttrib, m_colorAttrib, m_tcAttrib, m_hasTexture);
-	//	}
-	//}
 
 	glm::vec3 sunPos = glm::vec3(0.0f); // Sun is at origin
 
@@ -621,28 +552,29 @@ void Graphics::Render()
 		const std::string& name = planets[i].name;
 		glm::mat4 model = planet->GetModel();
 		glm::vec3 objPos = glm::vec3(model[3]);
-		glm::vec3 lightDir = glm::normalize(sunPos - objPos);
+		glm::vec3 lightDir = glm::normalize(objPos - sunPos);
 		glm::vec3 nightDir = -lightDir;
 
 		glm::vec3 lightColor, nightColor;
 
 		if (name == "Mercury" || name == "Venus" || name == "Earth") {
-			lightColor = glm::vec3(10.0f, 5.0f, 0.0f);
-			nightColor = glm::vec3(0.01f, 0.01f, 0.01f);
+			lightColor = glm::vec3(1.0f, 0.8f, 0.4f);       // warm white
+			nightColor = glm::vec3(0.05f);                 // soft ambient
 		}
 		else if (name == "Mars" || name == "Jupiter" || name == "Saturn") {
-			lightColor = glm::vec3(0.0f, 10.0f, 0.0f);
-			nightColor = glm::vec3(0.0f, 0.05f, 0.2f);
+			lightColor = glm::vec3(0.6f, 0.6f, 0.5f);       // soft greenish tone
+			nightColor = glm::vec3(0.02f, 0.05f, 0.08f);
 		}
 		else if (name == "Uranus" || name == "Neptune") {
-			lightColor = glm::vec3(0.0f, 1.0f, 10.0f);
-			nightColor = glm::vec3(0.3f, 0.3f, 1.0f);
+			lightColor = glm::vec3(0.2f, 0.4f, 1.0f);       // soft blue
+			nightColor = glm::vec3(0.1f, 0.1f, 0.2f);
 		}
+
 
 		glUniform3fv(m_lightColor, 1, glm::value_ptr(lightColor));
 		glUniform3fv(m_nightColor, 1, glm::value_ptr(nightColor));
+		glUniform3fv(m_ambientColor, 1, glm::value_ptr(ambientColor));
 		glUniform3fv(m_lightDir, 1, glm::value_ptr(lightDir));
-		glUniform3fv(m_nightDir, 1, glm::value_ptr(nightDir));
 		glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(model));
 
 		if (planet->hasTex) {
@@ -750,12 +682,8 @@ bool Graphics::collectShPrLocs() {
 	}
 
 	// Locate the color vertex attribute
-	m_normalAttrib = m_shader->GetAttribLocation("v_color");
-	if (m_normalAttrib == -1)
-	{
-		printf("v_color attribute not found\n");
-		anyProblem = false;
-	}
+	m_normalAttrib = m_shader->GetAttribLocation("v_normal");
+
 
 	// Locate the color vertex attribute
 	m_tcAttrib = m_shader->GetAttribLocation("v_tc");
