@@ -20,6 +20,8 @@ This project is a third-person space exploration game developed using C++ and Op
 ### Exploration Mode (Third Person)
 - `W / S`: Accelerate / Decelerate
 - `A / D`: Yaw left / right
+- `↑`: Tilt up
+- `↓`: Tilt down	
 - `Arrow Keys` or `Mouse Movement`: Pitch / steer
 - `TAB`: Toggle to Planetary Observation Mode
 
